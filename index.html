@@ -184,7 +184,7 @@
                 const volumes = timeLabels.map(time => excelData[time] || 0);
 
                 // Obter parâmetros
-                const workHours = parseFloat(document.getElementById('workHours').value) || 8;
+                const workHours = (parseFloat(document.getElementById('workHours').value))/12.6 || 8;
                 const tma = parseFloat(document.getElementById('tma').value) || 5;
                 const productiveTime = parseFloat(document.getElementById('productiveTime').value) / 100 || 0.85;
 
