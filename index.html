@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,76 +11,60 @@
     <!-- SheetJS para leitura de Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        body {
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-        }
-
-        .card {
-            margin-bottom: 20px;
-        }
-
-        .table {
-            margin-top: 20px;
-        }
-
-        canvas {
-            margin-top: 20px;
-        }
-
-        .operator-input {
-            width: 80px;
-            text-align: center;
-        }
+        body { padding: 20px; }
+        .container { max-width: 1200px; }
+        .card { margin-bottom: 20px; }
+        .table { margin-top: 20px; }
+        canvas { margin-top: 20px; }
+        .operator-input { width: 80px; text-align: center; }
     </style>
 </head>
-
 <body>
     <div class="container">
         <h1 class="text-center mb-4">Curva de Volumetria e Distribuição de Operadores</h1>
-
+        
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Carregar Arquivo Excel</h5>
                 <div class="mb-3">
-                    <label for="excelFile" class="form-label">Selecione o arquivo Excel (.xlsx, Horário,
-                        Volume):</label>
+                    <label for="excelFile" class="form-label">Selecione o arquivo Excel (.xlsx, Horário, Volume):</label>
                     <input type="file" class="form-control" id="excelFile" accept=".xlsx">
                 </div>
             </div>
         </div>
-
+        
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Parâmetros de Capacidade</h5>
                 <div class="row">
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-3 mb-3">
                         <label for="workHours" class="form-label">Jornada de Trabalho (horas):</label>
                         <input type="number" class="form-control" id="workHours" value="8" step="0.5">
                     </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-3 mb-3">
                         <label for="tma" class="form-label">TMA (minutos):</label>
                         <input type="number" class="form-control" id="tma" value="5">
                     </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-3 mb-3">
                         <label for="productiveTime" class="form-label">% Tempo Produtivo:</label>
                         <input type="number" class="form-control" id="productiveTime" value="85" max="100">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="pcaTarget" class="form-label">PCA Alvo (%):</label>
+                        <input type="number" class="form-control" id="pcaTarget" value="80" max="100">
                     </div>
                 </div>
                 <button class="btn btn-primary mt-3" onclick="updateChartAndTable()">Carregar Dados e Atualizar</button>
             </div>
         </div>
-
+        
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Gráfico</h5>
                 <canvas id="capacityChart"></canvas>
             </div>
         </div>
-
+        
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Distribuição de Operadores</h5>
@@ -92,6 +75,8 @@
                             <th>Volume</th>
                             <th>Operadores Alocados</th>
                             <th>Capacidade Alocada</th>
+                            <th>TB (s)</th>
+                            <th>PC (%)</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
@@ -145,7 +130,7 @@
         // Função para ler o arquivo Excel
         function readExcel(file, callback) {
             const reader = new FileReader();
-            reader.onload = function (e) {
+            reader.onload = function(e) {
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
                 const sheetName = workbook.SheetNames[0];
@@ -171,6 +156,68 @@
             reader.readAsArrayBuffer(file);
         }
 
+        // Função para calcular Erlang C (probabilidade de espera)
+        function erlangC(A, N) {
+            if (N <= 0) return 1;
+            let sum = 0;
+            for (let i = 0; i < N; i++) {
+                sum += (Math.pow(A, i) / factorial(i));
+            }
+            const numerator = (Math.pow(A, N) / factorial(N)) * (N / (N - A));
+            const denominator = sum + numerator;
+            return isFinite(numerator / denominator) ? numerator / denominator : 1;
+        }
+
+        // Função para calcular fatorial
+        function factorial(n) {
+            if (n <= 1) return 1;
+            return n * factorial(n - 1);
+        }
+
+        // Função para calcular TB (tempo de espera médio em segundos)
+        function calculateTB(volume, operators, tmaMinutes, intervalMinutes = 30) {
+            const tmaSeconds = tmaMinutes * 60;
+            const A = (volume * tmaSeconds) / (intervalMinutes * 60); // Erlangs
+            const N = operators;
+            if (N <= A) return Infinity; // Sistema instável
+            const Pw = erlangC(A, N);
+            const tb = (Pw * tmaSeconds) / (N - A);
+            return isFinite(tb) ? Math.round(tb) : Infinity;
+        }
+
+        // Função para calcular PCA atingido
+        function calculatePCA(volume, operators, tmaMinutes, intervalMinutes = 30) {
+            const tmaSeconds = tmaMinutes * 60;
+            const A = (volume * tmaSeconds) / (intervalMinutes * 60); // Erlangs
+            const N = operators;
+            if (A <= 0) return 100; // Sem volume, PCA é 100%
+            const Pw = erlangC(A, N);
+            const serviceTimeTarget = 20; // Tempo alvo para atendimento (20 segundos)
+            const probService = Pw * Math.exp(-((N - A) * serviceTimeTarget) / tmaSeconds);
+            const pca = (1 - probService) * 100;
+            return isFinite(pca) ? Math.round(pca * 10) / 10 : 0; // Arredonda para 1 casa decimal
+        }
+
+        // Função para calcular número de operadores necessário para atingir PCA alvo
+        function calculateOperatorsForPCA(volume, tmaMinutes, pcaTarget, intervalMinutes = 30, maxAttempts = 100) {
+            const tmaSeconds = tmaMinutes * 60;
+            const A = (volume * tmaSeconds) / (intervalMinutes * 60); // Erlangs
+            if (A <= 0) return 0;
+
+            const serviceTimeTarget = 20; // Tempo alvo para atendimento (20 segundos)
+            let N = Math.ceil(A); // Começa com o número mínimo de operadores
+            for (let i = 0; i < maxAttempts; i++) {
+                const Pw = erlangC(A, N);
+                const probService = Pw * Math.exp(-((N - A) * serviceTimeTarget) / tmaSeconds);
+                const pca = (1 - probService) * 100;
+                if (pca >= pcaTarget || N > 1000) {
+                    return N;
+                }
+                N++;
+            }
+            return N;
+        }
+
         // Função para atualizar gráfico e tabela
         function updateChartAndTable() {
             const excelFile = document.getElementById('excelFile').files[0];
@@ -187,24 +234,33 @@
                 const workHours = (parseFloat(document.getElementById('workHours').value))/12.6 || 8;
                 const tma = parseFloat(document.getElementById('tma').value) || 5;
                 const productiveTime = parseFloat(document.getElementById('productiveTime').value) / 100 || 0.85;
+                const pcaTarget = parseFloat(document.getElementById('pcaTarget').value) || 80;
 
                 // Calcular capacidade por operador
                 const productiveMinutes = workHours * 60 * productiveTime;
                 const capacityPerOperator = Math.floor(productiveMinutes / tma);
 
-                // Distribuir operadores (inicialmente)
-                const operatorsPerSlot = volumes.map(volume => Math.ceil(volume / capacityPerOperator));
+                // Distribuir operadores (inicialmente com PCA alvo)
+                const operatorsPerSlot = volumes.map(volume => 
+                    calculateOperatorsForPCA(volume, tma, pcaTarget)
+                );
 
                 // Atualizar tabela com inputs editáveis
                 const tableBody = document.getElementById('tableBody');
                 tableBody.innerHTML = '';
                 timeLabels.forEach((time, index) => {
+                    const operators = operatorsPerSlot[index];
+                    const capacity = operators * capacityPerOperator;
+                    const tb = calculateTB(volumes[index], operators, tma);
+                    const pca = calculatePCA(volumes[index], operators, tma);
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${time}</td>
                         <td>${volumes[index]}</td>
-                        <td><input type="number" class="operator-input" id="operator_${index}" value="${operatorsPerSlot[index]}" min="0" onchange="updateOperator(${index}, ${capacityPerOperator})"></td>
-                        <td id="capacity_${index}">${operatorsPerSlot[index] * capacityPerOperator}</td>
+                        <td><input type="number" class="operator-input" id="operator_${index}" value="${operators}" min="0" onchange="updateOperator(${index}, ${capacityPerOperator}, ${volumes[index]}, ${tma})"></td>
+                        <td id="capacity_${index}">${capacity}</td>
+                        <td id="tb_${index}">${tb === Infinity ? '∞' : tb}</td>
+                        <td id="pca_${index}">${pca}</td>
                     `;
                     tableBody.appendChild(row);
                 });
@@ -216,15 +272,21 @@
             });
         }
 
-        // Função para atualizar operadores e gráfico quando o input muda
-        function updateOperator(index, capacityPerOperator) {
+        // Função para atualizar operadores, capacidade, TB, PCA e gráfico
+        function updateOperator(index, capacityPerOperator, volume, tma) {
             const operatorInput = document.getElementById(`operator_${index}`);
             const newOperatorCount = parseInt(operatorInput.value) || 0;
             const capacityCell = document.getElementById(`capacity_${index}`);
-
-            // Atualizar capacidade na tabela
+            const tbCell = document.getElementById(`tb_${index}`);
+            const pcaCell = document.getElementById(`pca_${index}`);
+            
+            // Atualizar capacidade, TB e PCA na tabela
             const newCapacity = newOperatorCount * capacityPerOperator;
             capacityCell.textContent = newCapacity;
+            const newTB = calculateTB(volume, newOperatorCount, tma);
+            tbCell.textContent = newTB === Infinity ? '∞' : newTB;
+            const newPCA = calculatePCA(volume, newOperatorCount, tma);
+            pcaCell.textContent = newPCA;
 
             // Atualizar dados do gráfico
             const allocatedCapacity = timeLabels.map((_, i) => {
@@ -236,5 +298,4 @@
         }
     </script>
 </body>
-
 </html>
