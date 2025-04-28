@@ -141,6 +141,66 @@
             font-size: 0.875rem;
             color: #6c757d;
         }
+
+        .swal2-toast {
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            overflow: visible !important;
+            width: auto !important;
+            max-width: none !important;
+        }
+
+        .swal2-container {
+            align-items: flex-start !important;
+            justify-content: flex-start !important;
+            padding: 20px !important;
+            overflow: visible !important;
+        }
+
+        .swal2-popup {
+            width: auto !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+        }
+
+        .swal2-html-container {
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+            width: auto !important;
+            max-width: none !important;
+        }
+
+        .swal2-html-container>div {
+            display: flex !important;
+            align-items: center !important;
+            width: auto !important;
+            max-width: none !important;
+            overflow: visible !important;
+        }
+
+        .swal2-html-container img {
+            width: 150px !important;
+            height: auto !important;
+            flex-shrink: 0 !important;
+            margin-right: 20px !important;
+        }
+
+        .swal2-html-container span {
+            white-space: nowrap !important;
+            background-color: white !important;
+            border-radius: 10px !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+            padding: 15px !important;
+            font-size: 1.1em !important;
+            line-height: 1.4 !important;
+            color: #333 !important;
+            flex: 1 !important;
+            overflow: visible !important;
+        }
     </style>
 </head>
 
@@ -663,7 +723,7 @@
             toast: true,
             position: 'bottom-start',
             showConfirmButton: false,
-            timer: 20000,
+            timer: 120000,
             timerProgressBar: false,
             didOpen: (toast) => {
                 toast.addEventListener('mouseenter', Swal.stopTimer);
@@ -688,42 +748,42 @@
 
         function showAlert1(valor) {
             return showAlert('', {
-                html: '<div style="display: flex; align-items: center; white-space: nowrap; width: 100%;"><img src="/static/img/giphy (3).gif" style="margin-right: 10px; width:150px;"><span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">É hora de brilhar esse PCA - ' + valor + '%!</span></div>'
+                html: '<div style="display: flex; align-items: center; white-space: nowrap; width: 800px;"><img src="/static/img/giphy (3).gif" style="margin-right: 10px; width:150px;"><span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">É hora de brilhar esse PCA - ' + valor + '%!</span></div>'
             });
         }
 
         function showAlert3() {
             return showAlert('', {
-                html: '<div style="display: flex; align-items: center; white-space: nowrap; width: 100%;"><img src="/static/img/giphy (1).gif" style="margin-right: 10px; width:150px;"><span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">Tenha atenção ao tamanho da fila no voz!</span></div>'
+                html: '<div style="display: flex; align-items: center; white-space: nowrap; width: 800px;"><img src="/static/img/giphy (1).gif" style="margin-right: 10px; width:150px;"><span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">Tenha atenção ao tamanho da fila no voz!</span></div>'
             });
         }
 
         function showAlert4() {
             return showAlert('', {
-                html: '<div style="display: flex; align-items: center; white-space: nowrap; width: 100%;"><img src="/static/img/gmdKBCklQ7ElxAN7oH.webp" style="margin-right: 10px; width:150px;"><span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">A fila do chat já passou de 100!</span></div>'
+                html: '<div style="display: flex; align-items: center; white-space: nowrap; width: 800px;"><img src="/static/img/gmdKBCklQ7ElxAN7oH.webp" style="margin-right: 10px; width:150px;"><span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">Tem hora que cansa... A fila do chat já passou de 100!</span></div>'
             });
         }
 
         function showAlert5() {
             return showAlert('', {
-                html: '<div style="display: flex; align-items: center; white-space: nowrap; width: 100%;"><img src="/static/img/giphy (1).gif" style="margin-right: 10px; width:150px;"><span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">A fila do chat já passou de 50!</span></div>'
+                html: '<div style="display: flex; align-items: center; white-space: nowrap; width: 800px;"><img src="/static/img/giphy (1).gif" style="margin-right: 10px; width:150px;"><span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">A fila do chat já passou de 50!</span></div>'
             });
         }
 
         function showAlert6() {
             return showAlert('', {
-                html: '<div style="display: flex; align-items: center; white-space: nowrap; width: 100%;"><img src="/static/img/giphy (2).gif" style="margin-right: 10px; width:150px;"><span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">Você está ai ? ATENÇÃO, TÁ DURO DORME - Fila chat em 150!</span></div>'
+                html: '<div style="display: flex; align-items: center; white-space: nowrap; width: 800px;"><img src="/static/img/giphy (2).gif" style="margin-right: 10px; width:150px;"><span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">Você está ai ? ATENÇÃO, TÁ DURO DORME - Fila chat em 150!</span></div>'
             });
         }
 
         function showAlert7() {
             usoValidacao().then(dados => {
-                const mensagem = `<div style="display: flex; align-items: center; white-space: nowrap; width: 100%;">
-                <img src="/static/img/5E4KW8eET2iC2oxBZY.webp" style="margin-right: 10px; width:150px;">
-                <span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">
-                    Dados: Update Voz: ${dados.max_hora_cadastro}, Update Chat: ${dados.max_data_finalizacao}
-                </span>
-            </div>`;
+                const mensagem = `<div style="display: flex; align-items: center; white-space: nowrap; width: 800px;">
+                    <img src="/static/img/5E4KW8eET2iC2oxBZY.webp" style="margin-right: 10px; width:150px;">
+                    <span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">
+                        Dados: Update Voz: ${dados.max_hora_cadastro}, Update Chat: ${dados.max_data_finalizacao}
+                    </span>
+                </div>`;
                 return showAlert('', { html: mensagem });
             }).catch(error => {
                 console.error('Erro ao obter dados de validação:', error);
@@ -801,7 +861,7 @@
         // Modifique a função showAlert4 para receber e exibir a taxa de crescimento
         function showAlert4() {
             return showAlert('', {
-                html: '<div style="display: flex; align-items: center; white-space: nowrap; width: 100%;"><img src="/static/img/gmdKBCklQ7ElxAN7oH.webp" style="margin-right: 10px; width:110px;"><span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">Tem hora que cansa... A fila do chat já passou de 100!</span></div>'
+                html: '<div style="display: flex; align-items: center; white-space: nowrap; width: 800px; "><img src="/static/img/gmdKBCklQ7ElxAN7oH.webp" style="margin-right: 10px; width:110px;"><span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">Tem hora que cansa... A fila do chat já passou de 100!</span></div>'
             });
         }
 
@@ -855,26 +915,16 @@
         observerPca.observe(document.getElementById("valor_pca"), config);
         observerEsperaVoz.observe(document.getElementById("valor_espera"), config);
         observerChat.observe(document.getElementById("chatTotal"), config);
-
-        // CSS personalizado para o toast
         const style = document.createElement('style');
         style.innerHTML = `
-.custom-toast {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    margin-left: 20px !important; /* Adiciona margem à esquerda */
-    margin-bottom: 20px !important; /* Adiciona margem inferior */
-}
-
-.swal2-container {
-    align-items: flex-start !important;
-    justify-content: flex-start !important;
-    padding: 20px !important;
-}
-`;
+            .custom-toast {
+            background: none;
+            border: none;
+            box-shadow: none;
+            }
+        `;
         document.head.appendChild(style);
     </script>
 </body>
 
-</html>`````
+</html>
