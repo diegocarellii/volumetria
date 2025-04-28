@@ -71,6 +71,48 @@
       text-align: center;
     }
 
+    /* Dropdown styles */
+    .sidebar-item.dropdown {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .sidebar-item.dropdown .dropdown-menu {
+      display: none;
+      position: absolute;
+      left: 100%;
+      top: 0;
+      background-color: var(--sidebar-bg);
+      border-radius: 0 5px 5px 0;
+      padding: 0.5rem 0;
+      min-width: 200px;
+      box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+
+    .sidebar-item.dropdown:hover .dropdown-menu {
+      display: block;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      color: #fff;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    .dropdown-item:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .dropdown-item i {
+      margin-right: 0.75rem;
+      width: 20px;
+      text-align: center;
+    }
+
     /* Main content */
     .main-content {
       margin-left: 280px;
@@ -98,24 +140,6 @@
       left: 1rem;
       z-index: 1001;
       display: none;
-    }
-
-    @media (max-width: 768px) {
-      .sidebar {
-        margin-left: -280px;
-      }
-
-      .sidebar-toggle {
-        display: block;
-      }
-
-      .main-content {
-        margin-left: 0;
-      }
-
-      .sidebar.show {
-        margin-left: 0;
-      }
     }
 
     /* Cards */
@@ -346,7 +370,7 @@
       <div class="d-flex align-items-center">
         <img src="/static/img/pngwing.com.png" alt="Logo" class="rounded-circle me-2"
           style="width: 50px; height: 50px; border: 3px solid #6b50ff;">
-        <h5 class="text-white mb-0">DASHBOARD</h5>
+        <h5 class="text-white mb-0">Planejamento</h5>
       </div>
     </div>
 
@@ -358,11 +382,44 @@
           <span>Home</span>
         </a>
 
+        <div class="sidebar-item dropdown">
+          <i class="fas fa-chart-line sidebar-icon"></i>
+          <span>Forecasting</span>
+          <div class="dropdown-menu">
+            <a href="dime_volume_mensal" class="dropdown-item">
+              <i class="fas fa-calendar-alt"></i>
+              Volume Mensal
+            </a>
+            <a href="volumetria_dist_operadores" class="dropdown-item">
+              <i class="fas fa-users"></i>
+              Distribuição Operadores
+            </a>
+          </div>
+        </div>
+
         <a href="painelVoz" class="sidebar-item">
           <i class="fas fa-chart-line sidebar-icon"></i>
           <span>Dash</span>
         </a>
+        <div class="sidebar-item dropdown">
+          <i class="fas fa-chart-line sidebar-icon"></i>
+          <span>CHAT</span>
+          <div class="dropdown-menu">
+            <a href="clientesUSO" class="sidebar-item">
+              <i class="fa-solid fa-comment sidebar-icon"></i>
+              <span>Sent. CHAT</span>
+            </a>
+            <a href="analiseTickets" class="sidebar-item">
+              <i class="fa-solid fa-ticket-alt sidebar-icon"></i>
+              <span>Análise CHAT</span>
+            </a>
 
+            <a href="encerramentoUSO" class="sidebar-item">
+              <i class="fa-solid fa-cog sidebar-icon"></i>
+              <span>Enc. CHAT</span>
+            </a>
+          </div>
+        </div>
         <a href="mapa" class="sidebar-item">
           <i class="fas fa-map-location-dot sidebar-icon"></i>
           <span>Mapa</span>
@@ -371,21 +428,6 @@
         <a href="/" class="sidebar-item">
           <i class="fas fa-circle-exclamation sidebar-icon"></i>
           <span>Massivas</span>
-        </a>
-
-        <a href="clientesUSO" class="sidebar-item">
-          <i class="fa-solid fa-comment sidebar-icon"></i>
-          <span>Sent. CHAT</span>
-        </a>
-
-        <a href="analiseTickets" class="sidebar-item">
-          <i class="fa-solid fa-ticket-alt sidebar-icon"></i>
-          <span>Análise CHAT</span>
-        </a>
-
-        <a href="encerramentoUSO" class="sidebar-item">
-          <i class="fa-solid fa-cog sidebar-icon"></i>
-          <span>Enc. CHAT</span>
         </a>
       </div>
     </div>

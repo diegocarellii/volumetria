@@ -8,24 +8,209 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dime_volume_mensal.css') }}">
     <script src="{{url_for('static', filename='js/dime_volume_mensal.js')}}"></script>
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
+<style>
+    :root {
+        --primary-color: #5D5CDE;
+        --sidebar-bg: #1a1f36;
+        --card-bg: #ffffff;
+    }
+
+    /* Sidebar styles */
+    .sidebar {
+        background-color: var(--sidebar-bg);
+        width: 280px;
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        transition: 0.3s;
+        z-index: 1000;
+    }
+
+    .sidebar-collapsed {
+        margin-left: -280px;
+    }
+
+    .sidebar-header {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-menu {
+        padding: 1rem 0;
+    }
+
+    .sidebar-item {
+        padding: 0.75rem 1rem;
+        color: #fff;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        transition: 0.3s;
+    }
+
+    .sidebar-item:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-icon {
+        margin-right: 1rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    /* Dropdown styles */
+    .sidebar-item.dropdown {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .sidebar-item.dropdown .dropdown-menu {
+        display: none;
+        position: absolute;
+        left: 100%;
+        top: 0;
+        background-color: var(--sidebar-bg);
+        border-radius: 0 5px 5px 0;
+        padding: 0.5rem 0;
+        min-width: 200px;
+        box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+    }
+
+    .sidebar-item.dropdown:hover .dropdown-menu {
+        display: block;
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        color: #fff;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+    .dropdown-item:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .dropdown-item i {
+        margin-right: 0.75rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    /* Main content */
+    .main-content {
+        margin-left: 280px;
+        padding: 2rem;
+        transition: 0.3s;
+    }
+
+    .main-content-expanded {
+        margin-left: 0;
+    }
+
+    /* Stats cards */
+    .stats-card {
+        background: white;
+        border-left: 4px solid var(--primary-color);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Toggle button */
+    .sidebar-toggle {
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 1001;
+        display: none;
+    }
+</style>
 
 <body>
-    <div id="mySidebar" class="sidebar">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <a href="dime_volume_mensal">Dime. Volume</a>
-        <a href="volumetria_dist_operadores">Curva e Dime. de Operadores</a>
-        <a href="#">Configurações</a>
-        <a href="#">Ajuda</a>
-    </div>
+    <!-- Sidebar Toggle Button -->
+    <button class="btn btn-primary sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
 
-    <span class="hamburger" onclick="openNav()">&#9776;</span>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="d-flex align-items-center">
+                <img src="/static/img/pngwing.com.png" alt="Logo" class="rounded-circle me-2"
+                    style="width: 50px; height: 50px; border: 3px solid #6b50ff;">
+                <h5 class="text-white mb-0">Planejamento</h5>
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <p class="text-secondary small text-center mb-3">MAIN MENU</p>
+            <div class="nav flex-column">
+                <a href="home" class="sidebar-item">
+                    <i class="fas fa-home sidebar-icon"></i>
+                    <span>Home</span>
+                </a>
+
+                <div class="sidebar-item dropdown">
+                    <i class="fas fa-chart-line sidebar-icon"></i>
+                    <span>Forecasting</span>
+                    <div class="dropdown-menu">
+                        <a href="dime_volume_mensal" class="dropdown-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            Volume Mensal
+                        </a>
+                        <a href="volumetria_dist_operadores" class="dropdown-item">
+                            <i class="fas fa-users"></i>
+                            Distribuição Operadores
+                        </a>
+                    </div>
+                </div>
+
+                <a href="painelVoz" class="sidebar-item">
+                    <i class="fas fa-chart-line sidebar-icon"></i>
+                    <span>Dash</span>
+                </a>
+                <div class="sidebar-item dropdown">
+                    <i class="fas fa-chart-line sidebar-icon"></i>
+                    <span>CHAT</span>
+                    <div class="dropdown-menu">
+                        <a href="clientesUSO" class="sidebar-item">
+                            <i class="fa-solid fa-comment sidebar-icon"></i>
+                            <span>Sent. CHAT</span>
+                        </a>
+                        <a href="analiseTickets" class="sidebar-item">
+                            <i class="fa-solid fa-ticket-alt sidebar-icon"></i>
+                            <span>Análise CHAT</span>
+                        </a>
+
+                        <a href="encerramentoUSO" class="sidebar-item">
+                            <i class="fa-solid fa-cog sidebar-icon"></i>
+                            <span>Enc. CHAT</span>
+                        </a>
+                    </div>
+                </div>
+                <a href="mapa" class="sidebar-item">
+                    <i class="fas fa-map-location-dot sidebar-icon"></i>
+                    <span>Mapa</span>
+                </a>
+
+                <a href="/" class="sidebar-item">
+                    <i class="fas fa-circle-exclamation sidebar-icon"></i>
+                    <span>Massivas</span>
+                </a>
+            </div>
+        </div>
+    </nav>
 
     <div class="main-content">
         <div class="container">

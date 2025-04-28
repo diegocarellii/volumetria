@@ -9,6 +9,9 @@ from bibliotecas import *
 biscoito = "PHPSESSID=j4rf6hfo7tubpm20kc78k0pq73"
 
 #===================================================================
+@app.route('/folgas_gerencia')
+def folgas_gerencia():
+    return render_template('folgas.html')
 
 @app.route('/volumetria_dist_operadores')
 def volumetria_dist_operadores():
