@@ -1,0 +1,120 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;1,500&display=swap");
+
+body,
+html {
+    height: 100%;
+}
+
+#geral {
+    height: 100vh;
+    background-color: #2b2b2b;
+    /* Cor de fundo desejada */
+}
+
+#search-bar {
+    background-color: #00fa97;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+    width: 400px;
+    border: none;
+    border-radius: 5px;
+    margin-left: 10px;
+    height: 5vh;
+}
+
+#alertas {
+    height: 50px;
+    margin: 5px;
+    transition: all 0.3s ease-in-out;
+    background-color: #272727;
+    font-size: 25px;
+    font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
+    text-align: center;
+    color: #00fa97;
+    align-items: center;
+}
+
+#btn_quadro {
+    background-color: #6b50ff;
+    transform: translate(-50%, -50%);
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+    color: #ffffff;
+    font-size: 20px;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    margin-left: 72px;
+    margin-top: 20px;
+}
+
+#btn_quadro:hover {
+    background-color: #00fa97;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+    transform: translate(-50%, -50%);
+    color: #131313;
+    font-size: 20px;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    margin-left: 72px;
+    margin-top: 20px;
+}
+
+select {
+    background-color: #00fa97;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+    font-size: 20px;
+    border: none;
+    border-radius: 5px;
+    height: 25px;
+}
+
+input[type="search"] {
+    background-color: #00fa97;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+    font-size: 20px;
+    border: none;
+    border-radius: 5px;
+    height: 25px;
+}
+
+#my-table_info,
+#my-table_paginate {
+    color: #6b50ff;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
+#my-table {
+    color: #00fa97;
+}
+
+label {
+    color: #6b50ff;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #00fa97 #6b50ff;
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+    width: 13px;
+    margin-left: 10px;
+}
+
+*::-webkit-scrollbar-track {
+    background: #6b50ff;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: #00fa97;
+    border-radius: 0px;
+    border: 0px solid #ffffff;
+}
+
+#barra-lateral {
+    background-color: #272727;
+}

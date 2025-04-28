@@ -1,0 +1,182 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;1,500&display=swap');
+
+body {
+  background-color: #272727;
+
+}
+.data1 {
+  padding: 1rem;
+  margin-bottom: -30px;
+}
+.data2{
+  padding: 1rem;
+  margin-bottom: -30px;
+  margin-top: 15px;
+}
+#barra-lateral{
+  background-color: #272727;
+}
+input[type="number"] {
+  position: relative;
+  background-color: #00fa97;
+  transform: translate(-50%, -50%);
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  color: #ffffff;
+  font-size: 20px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  left: 50px;
+  width: 100px;
+  color: #1a1a1a;
+}
+h3{
+  height: 50px;
+  margin: 5px;
+  transition: all 0.3s ease-in-out;
+  background-color: #272727;
+  font-size: 25px;
+  font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
+  text-align: center;
+  color: #00fa97;
+  align-items: center;
+}
+#b_enviar, #b_enviar_sac {
+  background-color: #6b50ff;
+  transform: translate(-50%, -50%);
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  color: #ffffff;
+  font-size: 20px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  margin-left: 45px;
+}
+
+#b_enviar:hover, #b_enviar_sac:hover {
+  background-color: #00fa97;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  transform: translate(-50%, -50%);
+  color: #131313;
+  font-size: 20px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  margin-left: 45px;
+}
+
+#c-loader {
+  animation: is-rotating 1s infinite;
+  border: 6px solid #e5e5e5;
+  border-radius: 50%;
+  border-top-color: #00fa97;
+  height: 50px;
+  width: 50px;
+}
+
+#myDiv, #myDiv_SAC{
+  width: 100%;
+  height: 400px;
+  margin: 10px;
+  border-radius: 15px;
+  box-shadow: 7px 7px 13px 0px rgba(50, 50, 50, 0.22);
+  transition: all 0.3s ease-in-out;
+  background-color: #272727;
+  padding: 0.5rem;
+  overflow-y: auto;
+}
+
+#myDiv1, #myDiv1_SAC {
+  width: 100%;
+  height: 400px;
+  margin: 5px;
+  display: flex;
+  border-radius: 15px;
+  box-shadow: 7px 7px 13px 0px rgba(50, 50, 50, 0.22);
+  transition: all 0.3s ease-in-out;
+  background-color: #272727;
+  padding: 0.5rem;
+}
+
+#myDiv2, #myDiv2_SAC{
+  width: 99.2%;
+  height: 400px;
+  margin: 10px;
+  display: flex;
+  border-radius: 15px;
+  box-shadow: 7px 7px 13px 0px rgba(50, 50, 50, 0.22);
+  transition: all 0.3s ease-in-out;
+  background-color: #272727;
+  padding: 0.5rem;
+}
+#text2{
+  margin-top: 20px;
+}
+@keyframes is-rotating {
+  to {
+    transform: rotate(1turn);
+  }
+}
+.popup {
+  display: none; /* Oculta o popup inicialmente */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 550px;
+  height: 150px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px,
+    rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
+    rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+  border-radius: 5px;
+  text-align: center;
+  padding-top: 200px;
+  z-index: 999;
+}
+/* Estilo para a mensagem de carregamento no popup */
+.loading-message {
+  font-size: 24px;
+  font-weight: bold;
+  position: relative;
+  top: -115px;
+  align-items: center;
+  color: #00fa97;
+  animation: cor 2s infinite ease-in-out;
+}
+@keyframes cor {
+  0% {
+    color: #00fa97;
+  }
+  50% {
+    color: #6b50ff;
+  }
+  100% {
+    color: #00fa97;
+  }
+}
+.red-number {
+  color: red;
+}
+
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #00fa97 #6b50ff;
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 13px;
+  margin-left: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #6b50ff;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #00fa97;
+  border-radius: 0px;
+  border: 0px solid #ffffff;
+}

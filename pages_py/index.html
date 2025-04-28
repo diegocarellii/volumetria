@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Planejamento</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Other scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{url_for('static', filename='/js/index.js')}}"></script>
+    <link rel="icon" type="image/jpg" href="{{ url_for('static', filename='/img/alaresVERDE.png') }}">
+    <script src='https://cdn.plot.ly/plotly-2.27.0.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #5D5CDE;
+            --sidebar-bg: #1a1f36;
+            --card-bg: #ffffff;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            background-color: var(--sidebar-bg);
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            transition: 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar-collapsed {
+            margin-left: -280px;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .sidebar-item {
+            padding: 0.75rem 1rem;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: 0.3s;
+        }
+
+        .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-icon {
+            margin-right: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main content */
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            transition: 0.3s;
+        }
+
+        .main-content-expanded {
+            margin-left: 0;
+        }
+
+        /* Stats cards */
+        .stats-card {
+            background: white;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Toggle button */
+        .sidebar-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: -280px;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .sidebar.show {
+                margin-left: 0;
+            }
+        }
+
+        .donut-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .donut-center-value {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 10;
+        }
+
+        .donut-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1a1f36;
+        }
+
+        .donut-label {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar Toggle Button -->
+    <button class="btn btn-primary sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="d-flex align-items-center">
+                <img src="/static/img/pngwing.com.png" alt="Logo" class="rounded-circle me-2"
+                    style="width: 50px; height: 50px; border: 3px solid #6b50ff;">
+                <h5 class="text-white mb-0">DASHBOARD</h5>
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <p class="text-secondary small text-center mb-3">MAIN MENU</p>
+            <div class="nav flex-column">
+                <a href="home" class="sidebar-item">
+                    <i class="fas fa-home sidebar-icon"></i>
+                    <span>Home</span>
+                </a>
+
+                <a href="painelVoz" class="sidebar-item">
+                    <i class="fas fa-chart-line sidebar-icon"></i>
+                    <span>Dash</span>
+                </a>
+
+                <a href="mapa" class="sidebar-item">
+                    <i class="fas fa-map-location-dot sidebar-icon"></i>
+                    <span>Mapa</span>
+                </a>
+
+                <a href="/" class="sidebar-item">
+                    <i class="fas fa-circle-exclamation sidebar-icon"></i>
+                    <span>Massivas</span>
+                </a>
+
+                <a href="clientesUSO" class="sidebar-item">
+                    <i class="fa-solid fa-comment sidebar-icon"></i>
+                    <span>Sent. CHAT</span>
+                </a>
+
+                <a href="analiseTickets" class="sidebar-item">
+                    <i class="fa-solid fa-ticket-alt sidebar-icon"></i>
+                    <span>Análise CHAT</span>
+                </a>
+
+                <a href="encerramentoUSO" class="sidebar-item">
+                    <i class="fa-solid fa-cog sidebar-icon"></i>
+                    <span>Enc. CHAT</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header Stats -->
+        <div class="row mb-4">
+            <!-- Dashboard Content -->
+            <div class="flex-1 overflow-y-auto p-6" style="background-color: #ffffff;">
+                <!-- Stats Cards -->
+                <div class="row g-4">
+                    <!-- Recebidas Card -->
+                    <div class="col-md-2">
+                        <div class="card border-start border-primary border-4 h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="text-muted">RECEBIDAS</h5>
+                                    <div class="bg-primary bg-opacity-10 p-2 rounded">
+                                        <i class="fas fa-inbox text-primary"></i>
+                                    </div>
+                                </div>
+                                <h3 id="valor_recebidas" class="fs-2 fw-bold">0</h3>
+                                <div class="d-flex justify-content-center align-items-center fs-6">
+                                    <span>HD:</span>
+                                    <div id="total_consolidadoHD" class="ms-4">0</div>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-center fs-6">
+                                    <span>SAC:</span>
+                                    <div id="total_consolidadoSAC" class="ms-4">0</div>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-center fs-6">
+                                    <span>WEBBY:</span>
+                                    <div id="total_consolidadoWEBBY" class="ms-4">0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Atendidas Card -->
+                    <div class="col-md-2">
+                        <div class="card border-start border-success border-4 h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="text-muted">ATENDIDAS</h5>
+                                    <div class="bg-success bg-opacity-10 p-2 rounded">
+                                        <i class="fas fa-check-circle text-success"></i>
+                                    </div>
+                                </div>
+                                <h3 id="valor_atendidas" class="fs-2 fw-bold">0</h3>
+                                <div id="atendidas_consolidadoHD" class="text-center">0</div>
+                                <div id="atendidas_consolidadoSAC" class="text-center">0</div>
+                                <div id="atendidas_consolidadoWEBBY" class="text-center">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Abandonadas Card -->
+                    <div class="col-md-2">
+                        <div class="card border-start border-danger border-4 h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="text-muted">ABAND.</h5>
+                                    <div class="bg-danger bg-opacity-10 p-2 rounded">
+                                        <i class="fas fa-times-circle text-danger"></i>
+                                    </div>
+                                </div>
+                                <h3 id="valor_aband" class="fs-2 fw-bold">0</h3>
+                                <div id="abandonadas_consolidadoHD" class="text-center">0</div>
+                                <div id="abandonadas_consolidadoSAC" class="text-center">0</div>
+                                <div id="abandonadas_consolidadoWEBBY" class="text-center">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PCA Card -->
+                    <div class="col-md-2">
+                        <div class="card border-start border-warning border-4 h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="text-muted">PCA(%)</h5>
+                                    <div class="bg-warning bg-opacity-10 p-2 rounded">
+                                        <i class="fas fa-chart-pie text-warning"></i>
+                                    </div>
+                                </div>
+                                <h3 id="valor_pca" class="fs-2 fw-bold">0</h3>
+                                <div id="pca_consolidadoHD" class="text-center">0</div>
+                                <div id="pca_consolidadoSAC" class="text-center">0</div>
+                                <div id="pca_consolidadoWEBBY" class="text-center">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TME Card -->
+                    <div class="col-md-2">
+                        <div class="card border-start border-info border-4 h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="text-muted">TME</h5>
+                                    <div class="bg-info bg-opacity-10 p-2 rounded">
+                                        <i class="fas fa-clock text-info"></i>
+                                    </div>
+                                </div>
+                                <h3 id="valor_tme" class="fs-2 fw-bold">00:00:00</h3>
+                                <div id="tme_consolidadoHD" class="text-center">00:00:00</div>
+                                <div id="tme_consolidadoSAC" class="text-center">00:00:00</div>
+                                <div id="tme_consolidadoWEBBY" class="text-center">00:00:00</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TMA Card -->
+                    <div class="col-md-2">
+                        <div class="card border-start border-secondary border-4 h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="text-muted">TMA</h5>
+                                    <div class="bg-secondary bg-opacity-10 p-2 rounded">
+                                        <i class="fas fa-hourglass-half text-secondary"></i>
+                                    </div>
+                                </div>
+                                <h3 id="valor_tma" class="fs-2 fw-bold">00:00:00</h3>
+                                <div id="tma_consolidadoHD" class="text-center">00:00:00</div>
+                                <div id="tma_consolidadoSAC" class="text-center">00:00:00</div>
+                                <div id="tma_consolidadoWEBBY" class="text-center">00:00:00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção de Gráficos e Controles -->
+            <div class="container-fluid mt-4">
+                <!-- Botão de Volumetria -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <button class="btn btn-primary" onclick="updateGrafico()">
+                            Volumetria
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Área de Controles e Gráfico -->
+                <div class="row">
+                    <!-- Controles -->
+                    <div class="col-12 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center justify-content-center gap-3">
+                                    <input type="text" id="horarioInput" class="form-control" style="max-width: 200px;"
+                                        placeholder="Digite o horário (HH:MM)">
+
+                                    <input type="text" id="textoInput" class="form-control" style="max-width: 200px;"
+                                        placeholder="Digite o texto">
+
+                                    <button id="adicionarLinha" class="btn btn-primary">
+                                        Adicionar Linha
+                                    </button>
+
+                                    <div class="form-check">
+                                        <input type="checkbox" id="checkboxPCA" class="form-check-input" checked>
+                                        <label class="form-check-label" for="checkboxPCA">
+                                            Exibir PCA
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Área do Gráfico -->
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div id="render_grafico"></div>
+                                <div id="myDiv"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção de Bloqueios e Demanda -->
+                <div class="row mt-4">
+                    <!-- Gráfico de Bloqueios -->
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title mb-0">Bloqueios</h5>
+                                    <button class="btn btn-primary" onclick="demanda()">
+                                        Bloqueios
+                                    </button>
+                                </div>
+                                <div class="donut-container">
+                                    <canvas id="invoiceChart"></canvas>
+                                    <div class="donut-center-value">
+                                        <div id="bloqueio_valor" class="donut-value">0</div>
+                                        <div class="donut-label">Total Bloqueios</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráfico de Pesquisa Demanda -->
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title mb-0">Pesquisa Demanda</h5>
+                                    <button class="btn btn-primary" onclick="pesquisaDemanda()">
+                                        Demanda
+                                    </button>
+                                </div>
+                                <div style="height: 300px; position: relative;">
+                                    <canvas id="invoiceChart1"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Table Section -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Recent Invoices</h5>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Id Customers</th>
+                                <th>Customers name</th>
+                                <th>Items Name</th>
+                                <th>Order Date</th>
+                                <th>Status</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>#065499</td>
+                                <td>Eren Yeager</td>
+                                <td>1 x Black Backpack</td>
+                                <td>21/07/2022 08:21</td>
+                                <td>Paid</td>
+                                <td>$101</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>#065499</td>
+                                <td>Levi Ackerman</td>
+                                <td>1 x Distro Backpack</td>
+                                <td>21/07/2022 08:21</td>
+                                <td>Pending</td>
+                                <td>$144</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>#065499</td>
+                                <td>Rainer Brown</td>
+                                <td>1 x New Backpack</td>
+                                <td>21/07/2022 08:21</td>
+                                <td>Paid</td>
+                                <td>$121</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>#065499</td>
+                                <td>Historia Reiss</td>
+                                <td>2 x Black Backpack</td>
+                                <td>21/07/2022 08:21</td>
+                                <td>Overdue</td>
+                                <td>$300</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Sidebar toggle functionality
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('sidebar-collapsed');
+            document.querySelector('.main-content').classList.toggle('main-content-expanded');
+        });
+
+        // Your existing JavaScript code here
+    </script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fazGET_GRAFICO();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fazGetChat();
+        });
+
+        // Substitua o script dos gráficos por este:
+        document.addEventListener('DOMContentLoaded', async function () {
+            try {
+                // Primeiro gráfico - Bloqueios (Doughnut)
+                const response = await fetch("/pesquisa_demanda");
+                const banco = await response.json();
+
+                console.log('Dados do primeiro gráfico:', banco);
+
+                const assunto = Object.values(banco["data"]);
+                const contagem = Object.values(banco["quantidade"]);
+
+                const invoiceCtx = document.getElementById('invoiceChart');
+                if (!invoiceCtx) {
+                    console.error('Canvas do primeiro gráfico não encontrado');
+                    return;
+                }
+                document.getElementById("bloqueio_valor").innerHTML = contagem[0];
+
+                // Destrói o gráfico anterior se existir
+                let chartStatus = Chart.getChart("invoiceChart");
+                if (chartStatus != undefined) {
+                    chartStatus.destroy();
+                }
+
+                // Cria o gráfico de bloqueios
+                new Chart(invoiceCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: assunto,
+                        datasets: [{
+                            data: contagem,
+                            backgroundColor: [
+                                '#9e8dff',
+                                '#ffffff'
+                            ],
+                            borderWidth: 1,
+                            borderColor: '#1a1f36',
+                            cutout: '60%',
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Segundo gráfico - Pesquisa Demanda (Bar)
+                const response2 = await fetch("/pesquisa_demandaReport1");
+                const banco2 = await response2.json();
+
+                console.log('Dados do segundo gráfico:', banco2);
+
+                const assunto2 = Object.values(banco2["Assunto"]);
+                const contagem2 = Object.values(banco2["Contagem Alares"]);
+                const contagem_webby = Object.values(banco2["Contagem Webby"]);
+
+                const invoiceCtx2 = document.getElementById('invoiceChart1');
+                if (!invoiceCtx2) {
+                    console.error('Canvas do segundo gráfico não encontrado');
+                    return;
+                }
+
+                // Destrói o gráfico anterior se existir
+                let chartStatus2 = Chart.getChart("invoiceChart1");
+                if (chartStatus2 != undefined) {
+                    chartStatus2.destroy();
+                }
+
+                // Cria o gráfico de barras
+                new Chart(invoiceCtx2, {
+                    type: 'bar',
+                    data: {
+                        labels: assunto2,
+                        datasets: [
+                            {
+                                label: 'Alares',
+                                data: contagem2,
+                                backgroundColor: '#9e8dff',
+                                borderWidth: 0
+                            },
+                            {
+                                label: 'Webby',
+                                data: contagem_webby,
+                                backgroundColor: '#00fa97',
+                                borderWidth: 0
+                            }
+                        ]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error('Erro ao carregar os gráficos:', error);
+            }
+        });
+
+        // Mobile Menu
+        document.getElementById('mobile-menu-trigger')?.addEventListener('click', function () {
+            document.getElementById('mobile-sidebar').classList.remove('hidden');
+        });
+
+        document.getElementById('mobile-menu-btn')?.addEventListener('click', function () {
+            document.getElementById('mobile-sidebar').classList.remove('hidden');
+        });
+
+        document.getElementById('close-mobile-menu')?.addEventListener('click', function () {
+            document.getElementById('mobile-sidebar').classList.add('hidden');
+        });
+
+        // Close mobile menu when clicking outside
+        document.getElementById('mobile-sidebar')?.addEventListener('click', function (e) {
+            if (e.target === this) {
+                this.classList.add('hidden');
+            }
+        });
+    </script>
+
+    <!--=====================================================================-->
+    <script>
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'bottom-start',
+            showConfirmButton: false,
+            timer: 20000,
+            timerProgressBar: false,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer);
+                toast.addEventListener('mouseleave', Swal.resumeTimer);
+            },
+            customClass: {
+                popup: 'custom-toast'
+            }
+        });
+
+        function showAlert(message, options) {
+            return Toast.fire({
+                title: message,
+                ...options,
+                position: 'bottom-start',
+                showCloseButton: true,
+                customClass: {
+                    popup: 'custom-toast'
+                }
+            });
+        }
+
+        function showAlert1(valor) {
+            return showAlert('', {
+                html: '<div style="display: flex; align-items: center; white-space: nowrap; width: 100%;"><img src="/static/img/giphy (3).gif" style="margin-right: 10px; width:150px;"><span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">É hora de brilhar esse PCA - ' + valor + '%!</span></div>'
+            });
+        }
+
+        function showAlert3() {
+            return showAlert('', {
+                html: '<div style="display: flex; align-items: center; white-space: nowrap; width: 100%;"><img src="/static/img/giphy (1).gif" style="margin-right: 10px; width:150px;"><span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">Tenha atenção ao tamanho da fila no voz!</span></div>'
+            });
+        }
+
+        function showAlert4() {
+            return showAlert('', {
+                html: '<div style="display: flex; align-items: center; white-space: nowrap; width: 100%;"><img src="/static/img/gmdKBCklQ7ElxAN7oH.webp" style="margin-right: 10px; width:150px;"><span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">A fila do chat já passou de 100!</span></div>'
+            });
+        }
+
+        function showAlert5() {
+            return showAlert('', {
+                html: '<div style="display: flex; align-items: center; white-space: nowrap; width: 100%;"><img src="/static/img/giphy (1).gif" style="margin-right: 10px; width:150px;"><span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">A fila do chat já passou de 50!</span></div>'
+            });
+        }
+
+        function showAlert6() {
+            return showAlert('', {
+                html: '<div style="display: flex; align-items: center; white-space: nowrap; width: 100%;"><img src="/static/img/giphy (2).gif" style="margin-right: 10px; width:150px;"><span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">Você está ai ? ATENÇÃO, TÁ DURO DORME - Fila chat em 150!</span></div>'
+            });
+        }
+
+        function showAlert7() {
+            usoValidacao().then(dados => {
+                const mensagem = `<div style="display: flex; align-items: center; white-space: nowrap; width: 100%;">
+                <img src="/static/img/5E4KW8eET2iC2oxBZY.webp" style="margin-right: 10px; width:150px;">
+                <span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">
+                    Dados: Update Voz: ${dados.max_hora_cadastro}, Update Chat: ${dados.max_data_finalizacao}
+                </span>
+            </div>`;
+                return showAlert('', { html: mensagem });
+            }).catch(error => {
+                console.error('Erro ao obter dados de validação:', error);
+            });
+        }
+
+        let valorAnteriorPca = null;
+        let valorAnteriorEsperaVoz = null;
+        let valorAnteriorChat = null;
+
+        function atualizarLocalStorage(chave, valor) {
+            const vetor = JSON.parse(localStorage.getItem(chave)) || [];
+            vetor.push(valor);
+            localStorage.setItem(chave, JSON.stringify(vetor));
+        }
+
+        function calcularMediaMovel() {
+            const vetorPca = JSON.parse(localStorage.getItem("valor_pca")) || [];
+            if (vetorPca.length < 3) return;
+
+            const mediaMovel =
+                (parseFloat(vetorPca[vetorPca.length - 1]) +
+                    parseFloat(vetorPca[vetorPca.length - 2]) +
+                    parseFloat(vetorPca[vetorPca.length - 3])) / 3;
+
+            const valorMaisRecente = parseFloat(vetorPca[vetorPca.length - 1]);
+            if (mediaMovel < valorMaisRecente) {
+                showAlert(valorMaisRecente, {
+                    icon: 'warning',
+                    html: '<div>PCA está subindo!</div>'
+                });
+            } else {
+                showAlert1(valorMaisRecente);
+            }
+        }
+
+        function filavoz() {
+            const vetorEsperaVoz = JSON.parse(localStorage.getItem("espera_voz")) || [];
+            if (vetorEsperaVoz.length > 0 && parseInt(vetorEsperaVoz[vetorEsperaVoz.length - 1]) >= 40) {
+                showAlert3();
+            }
+        }
+
+        function filachat() {
+            const vetorChat = JSON.parse(localStorage.getItem("espera_chat")) || [];
+            if (vetorChat.length > 0) {
+                const valorAtual = parseInt(vetorChat[vetorChat.length - 1]);
+
+                // Cálculo da taxa de crescimento médio
+                let taxaCrescimento = 0;
+                if (vetorChat.length > 1) {
+                    const ultimosValores = vetorChat.slice(-5); // Pega os últimos 5 valores
+                    const diferencas = [];
+                    for (let i = 1; i < ultimosValores.length; i++) {
+                        diferencas.push(parseInt(ultimosValores[i]) - parseInt(ultimosValores[i - 1]));
+                    }
+                    taxaCrescimento = diferencas.reduce((a, b) => a + b, 0) / diferencas.length;
+                }
+
+                if (valorAtual >= 150) {
+                    showAlert6();
+                    return;
+                }
+                if (valorAtual >= 100) {
+                    showAlert4(taxaCrescimento);
+                    return;
+                }
+                if (valorAtual >= 50) {
+                    showAlert5();
+                    return;
+                }
+            }
+        }
+
+        // Modifique a função showAlert4 para receber e exibir a taxa de crescimento
+        function showAlert4() {
+            return showAlert('', {
+                html: '<div style="display: flex; align-items: center; white-space: nowrap; width: 100%;"><img src="/static/img/gmdKBCklQ7ElxAN7oH.webp" style="margin-right: 10px; width:110px;"><span style="background-color:white;border-radius: 10px;box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); padding:10px;">Tem hora que cansa... A fila do chat já passou de 100!</span></div>'
+            });
+        }
+
+        // Funções de monitoramento
+        function monitorarVariavelPca(mutations) {
+            mutations.forEach(mutation => {
+                const valorPca = mutation.target.textContent;
+                if (valorPca !== valorAnteriorPca) {
+                    valorAnteriorPca = valorPca;
+                    atualizarLocalStorage("valor_pca", valorPca);
+                    calcularMediaMovel();
+                }
+            });
+        }
+
+        function monitorarVariavelEsperaVoz(mutations) {
+            mutations.forEach(mutation => {
+                const valorEsperaVoz = mutation.target.textContent;
+                if (valorEsperaVoz !== valorAnteriorEsperaVoz) {
+                    valorAnteriorEsperaVoz = valorEsperaVoz;
+                    atualizarLocalStorage("espera_voz", valorEsperaVoz);
+                    filavoz();
+                }
+            });
+        }
+
+        function monitorarVariavelChat(mutations) {
+            mutations.forEach(mutation => {
+                const valorChat = mutation.target.textContent;
+                if (valorChat !== valorAnteriorChat) {
+                    valorAnteriorChat = valorChat;
+                    atualizarLocalStorage("espera_chat", valorChat);
+                    filachat();
+                }
+            });
+        }
+
+        // Criando os Mutation Observers
+        const observerPca = new MutationObserver(monitorarVariavelPca);
+        const observerEsperaVoz = new MutationObserver(monitorarVariavelEsperaVoz);
+        const observerChat = new MutationObserver(monitorarVariavelChat);
+
+        // Configurações do observer
+        const config = {
+            childList: true,
+            subtree: true,
+            characterData: true,
+        };
+
+        // Observando os elementos desejados
+        observerPca.observe(document.getElementById("valor_pca"), config);
+        observerEsperaVoz.observe(document.getElementById("valor_espera"), config);
+        observerChat.observe(document.getElementById("chatTotal"), config);
+
+        // CSS personalizado para o toast
+        const style = document.createElement('style');
+        style.innerHTML = `
+.custom-toast {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    margin-left: 20px !important; /* Adiciona margem à esquerda */
+    margin-bottom: 20px !important; /* Adiciona margem inferior */
+}
+
+.swal2-container {
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    padding: 20px !important;
+}
+`;
+        document.head.appendChild(style);
+    </script>
+</body>
+
+</html>
+`````

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Planejamento</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="{{url_for('static', filename='/js/index.js')}}"></script>
+    <link rel="icon" type="image/jpg" href="{{ url_for('static', filename='/img/alaresVERDE.png') }}">
+    <script src='https://cdn.plot.ly/plotly-2.27.0.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        sidebar: '#1a1f36',
+                        card: '#ffffff',
+                        success: '#4ade80',
+                        danger: '#ef4444',
+                        warning: '#f97316',
+                        dark: '#181818',
+                    }
+                }
+            },
+        }
+    </script>
+
+    </style>
+</head>
+
+<body class="bg-gray-100 text-gray-800 min-h-screen flex">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-sidebar text-white flex-shrink-0 hidden md:flex flex-col shadow-lg" aria-label="Sidebar">
+        <div class="p-5 border-b border-white/10 flex items-center">
+            <i class="fas fa-tachometer-alt mr-3"></i>
+            <h1 class="text-xl font-bold uppercase">DASHBOARD</h1>
+        </div>
+
+        <div class="mt-4 px-3 flex-1">
+            <p class="text-xs text-gray-400 px-2 mb-2" style="text-align: center;">MAIN MENU</p>
+            <nav aria-label="Main Menu">
+                <ul class="space-y-8 flex flex-col items-center">
+                    <li>
+                        <a href="home" class="sidebar-item active text-lg hover:bg-gray-700 transition-colors"
+                            aria-label="Dashboard">
+                            <i class="fas fa-home sidebar-icon"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="group dropdown">
+                        <a href="#" class="dropdown-toggle text-lg sidebar-item hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-chart-bar"></i>
+                            <span class="nav-item">Dashboard</span>
+                        </a>
+                        <ul class="dropdown-menu space-y-4 hidden group-hover:block" style="margin-top: 10px;">
+                            <li><a href="painelVoz" target="_blank"
+                                    class="sidebar-item text-lg hover:bg-gray-700 transition-colors">
+                                    <i class="fa-solid fa-clock"></i>
+                                    <span class="nav-item" id="submenu">Real Time</span>
+                                </a></li>
+                            <li><a href="pesquisa_demandaFULL" target="_blank"
+                                    class="sidebar-item text-lg hover:bg-gray-700 transition-colors">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                    <span class="nav-item" id="submenu">Pesquisa Demanda</span>
+                                </a></li>
+                        </ul>
+                    </li>
+                    <li class="group dropdown">
+                        <a href="#" class="dropdown-toggle text-lg sidebar-item hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-chart-bar"></i>
+                            <span class="nav-item">Análise USO</span>
+                        </a>
+                        <ul class="dropdown-menu space-y-4 hidden group-hover:block" style="margin-top: 10px;">
+                            <li><a href="clientesUSO" target="_blank"
+                                    class="sidebar-item  text-lg hover:bg-gray-700 transition-colors">
+                                    <i class="fa-solid fa-comment"></i>
+                                    <span class="nav-item" id="submenu">Sent. CHAT</span>
+                                </a></li>
+                            <li><a href="analiseTickets" target="_blank"
+                                    class="sidebar-item text-lg hover:bg-gray-700 transition-colors">
+                                    <i class="fa-solid fa-ticket-alt"></i>
+                                    <span class="nav-item" id="submenu">Análise Tickets</span>
+                                </a></li>
+                            <li><a href="encerramentoUSO" target="_blank"
+                                    class="sidebar-item text-lg hover:bg-gray-700 transition-colors">
+                                    <i class="fa-solid fa-cog"></i>
+                                    <span class="nav-item">Enc. CHAT</span>
+                                </a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="mapa" class="sidebar-item text-lg hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-map-location-dot sidebar-icon"></i>
+                            <span>Mapa</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/" class="sidebar-item text-lg hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-circle-exclamation sidebar-icon"></i>
+                            <span>Massivas</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Mobile sidebar button -->
+    <div class="md:hidden fixed bottom-4 right-4 z-50">
+        <button id="mobile-menu-btn" class="bg-primary text-white p-3 rounded-full shadow-lg"
+            aria-label="Open mobile menu">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden" aria-label="Main Content">
+        <header class="bg-white border-b border-gray-200  flex items-center justify-between"
+            style="justify-content: center;">
+    
+            <div class="flex items-center space-x-4" style="text-align: center;">
+                <div class="flex space-x-4 p-4">
+                        <h2 style="font-weight: bold; font-size: 24px;">SENTIMENTO USO</h2>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6" style="background-color: #ffffff;">
+            <div class="grid grid-cols-1 md:gap-6 mb-6" style="display: flex;">
+                <form action="/upload" method="post" enctype="multipart/form-data">
+
+                    <input type="file" name="file" id="inputGroupFileAddon03">
+                    <input type="submit" value="Enviar"
+                        style="width: 100px; font-weight: bold; border-radius: 3px; border: none; cursor: pointer; background-color: #6b50ff; color: aliceblue;">
+                    </form>
+                    <img src="/static/img/OtOQNUz48L.gif" alt="" style="width: 350px; height:350px">
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile sidebar -->
+    <div id="mobile-sidebar" class="md:hidden fixed inset-0 bg-gray-900/50 z-40 hidden">
+        <div class="bg-sidebar text-white h-full w-64 flex flex-col">
+            <div class="p-5 border-b border-white/10 flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    <h1 class="text-xl font-bold uppercase">DeskBoard</h1>
+                </div>
+                <button id="close-mobile-menu" class="text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <p class="text-xs text-gray-400 px-5 pt-3">Sales Management Dashboard</p>
+
+            <div class="mt-4 px-3 flex-1 overflow-y-auto">
+                <p class="text-xs text-gray-400 px-2 mb-2">MAIN MENU</p>
+                <nav>
+                    <ul class="space-y-1">
+                        <li>
+                            <a href="home" class="sidebar-item active">
+                                <i class="fas fa-home sidebar-icon"></i>
+                                <span>Home</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="painelVoz" class="sidebar-item">
+                                <i class="fas fa-chart-line sidebar-icon"></i>
+                                <span>Dash</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="mapa" class="sidebar-item">
+                                <i class="fas fa-map-location-dot sidebar-icon"></i>
+                                <span>Mapa</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/" class="sidebar-item">
+                                <i class="fas fa-circle-exclamation sidebar-icon"></i>
+                                <span>Massivas</span>
+                            </a>
+                        </li>
+                        <li class="group dropdown">
+                            <a href="#" class="dropdown-toggle">
+                                <i class="fas fa-chart-bar"></i>
+                                <span class="nav-item">Análise USO</span>
+                            </a>
+                            <ul class="dropdown-menu hidden group-hover:block">
+                                <li><a href="painelVoz" target="_blank">
+                                        <i class="fa-solid fa-clock"></i>
+                                        <span class="nav-item" id="submenu">Real Time</span>
+                                    </a></li>
+                                <li><a href="pesquisa_demandaFULL" target="_blank">
+                                        <i class="fa-solid fa-magnifying-glass"></i>
+                                        <span class="nav-item" id="submenu">Pesquisa <br> Demanda</span>
+                                    </a></li>
+                                <li><a href="clientesUSO" target="_blank">
+                                        <i class="fa-solid fa-comment"></i>
+                                        <span class="nav-item" id="submenu">Sent. CHAT</span>
+                                    </a></li>
+                                <li><a href="analiseTickets" target="_blank">
+                                        <i class="fa-solid fa-ticket-alt"></i>
+                                        <span class="nav-item" id="submenu">Análise Tickets</span>
+                                    </a></li>
+                                <li><a href="encerramentoUSO" target="_blank">
+                                        <i class="fa-solid fa-cog"></i>
+                                        <span class="nav-item">Enc. CHAT</span>
+                                    </a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

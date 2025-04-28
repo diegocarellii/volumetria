@@ -1,0 +1,84 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.container {
+    max-width: 1200px;
+    margin-top: 30px;
+}
+
+.table-container {
+    margin-top: 20px;
+}
+
+.month-card {
+    margin-bottom: 20px;
+}
+
+.chart-container {
+    margin-top: 20px;
+    width: 100%;
+}
+
+.ajuste-input {
+    width: 80px;
+}
+
+.sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #343a40;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.sidebar a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #f8f9fa;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidebar a:hover {
+    color: #007bff;
+}
+
+.sidebar .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+.hamburger {
+    font-size: 30px;
+    cursor: pointer;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 2;
+    color: #343a40;
+}
+
+.main-content {
+    transition: margin-left .5s;
+    padding: 16px;
+}
+
+@media screen and (max-height: 450px) {
+    .sidebar {
+        padding-top: 15px;
+    }
+
+    .sidebar a {
+        font-size: 18px;
+    }
+}

@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Planejamento</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{ url_for('static', filename='/js/quadro.js') }}"></script>
+  <script src='https://cdn.plot.ly/plotly-2.27.0.min.js'></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://cdn.datatables.net/2.1.2/js/dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/2.1.2/js/dataTables.bootstrap5.min.js"></script>
+
+  <!-- Custom CSS -->
+  <style>
+    :root {
+      --primary-color: #5D5CDE;
+      --sidebar-bg: #1a1f36;
+      --card-bg: #ffffff;
+    }
+
+    /* Sidebar styles */
+    .sidebar {
+      background-color: var(--sidebar-bg);
+      width: 280px;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      transition: 0.3s;
+      z-index: 1000;
+    }
+
+    .sidebar-collapsed {
+      margin-left: -280px;
+    }
+
+    .sidebar-header {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-menu {
+      padding: 1rem 0;
+    }
+
+    .sidebar-item {
+      padding: 0.75rem 1rem;
+      color: #fff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      transition: 0.3s;
+    }
+
+    .sidebar-item:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-icon {
+      margin-right: 1rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* Main content */
+    .main-content {
+      margin-left: 280px;
+      padding: 2rem;
+      transition: 0.3s;
+    }
+
+    .main-content-expanded {
+      margin-left: 0;
+    }
+
+    /* Stats cards */
+    .stats-card {
+      background: white;
+      border-left: 4px solid var(--primary-color);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Toggle button */
+    .sidebar-toggle {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1001;
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        margin-left: -280px;
+      }
+
+      .sidebar-toggle {
+        display: block;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .sidebar.show {
+        margin-left: 0;
+      }
+    }
+
+    /* Cards */
+    .custom-card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Custom Button */
+    .btn-custom {
+      background-color: #555cfb;
+      border: 2px solid #04fb94;
+      color: white;
+      transition: all 0.3s ease;
+    }
+
+    .btn-custom:hover {
+      background-color: #4448d9;
+      border-color: #03e085;
+      color: white;
+    }
+
+    /* Table */
+    .table thead {
+      background-color: #555cfb;
+      color: white;
+    }
+
+    .table thead th {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    /* Form Control */
+    .form-control:focus {
+      border-color: #555cfb;
+      box-shadow: 0 0 0 0.2rem rgba(85, 92, 251, 0.25);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: 0.3s;
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Sidebar Toggle Button -->
+  <button class="btn btn-primary sidebar-toggle" id="sidebarToggle">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="d-flex align-items-center">
+        <img src="/static/img/pngwing.com.png" alt="Logo" class="rounded-circle me-2"
+          style="width: 50px; height: 50px; border: 3px solid #6b50ff;">
+        <h5 class="text-white mb-0">DASHBOARD</h5>
+      </div>
+    </div>
+
+    <div class="sidebar-menu">
+      <p class="text-secondary small text-center mb-3">MAIN MENU</p>
+      <div class="nav flex-column">
+        <a href="home" class="sidebar-item">
+          <i class="fas fa-home sidebar-icon"></i>
+          <span>Home</span>
+        </a>
+
+        <a href="painelVoz" class="sidebar-item">
+          <i class="fas fa-chart-line sidebar-icon"></i>
+          <span>Dash</span>
+        </a>
+
+        <a href="mapa" class="sidebar-item">
+          <i class="fas fa-map-location-dot sidebar-icon"></i>
+          <span>Mapa</span>
+        </a>
+
+        <a href="/" class="sidebar-item">
+          <i class="fas fa-circle-exclamation sidebar-icon"></i>
+          <span>Massivas</span>
+        </a>
+
+        <a href="clientesUSO" class="sidebar-item">
+          <i class="fa-solid fa-comment sidebar-icon"></i>
+          <span>Sent. CHAT</span>
+        </a>
+
+        <a href="analiseTickets" class="sidebar-item">
+          <i class="fa-solid fa-ticket-alt sidebar-icon"></i>
+          <span>Análise CHAT</span>
+        </a>
+
+        <a href="encerramentoUSO" class="sidebar-item">
+          <i class="fa-solid fa-cog sidebar-icon"></i>
+          <span>Enc. CHAT</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container-fluid py-4">
+      <!-- Header -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <h2 class="text-center fw-bold">ATUALIZAÇÃO EM LOTE</h2>
+        </div>
+      </div>
+
+      <!-- Cards Grid -->
+      <div class="row g-4">
+        <!-- Cadastrar Operador Card -->
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-4">
+                <img src="/static/img/customer-service-agent.png" alt="" class="me-3"
+                  style="width: 48px; height: 48px;">
+                <h3 class="h5 mb-0">CADASTRAR OPERADOR</h3>
+              </div>
+              <form method="POST" action="/cadastrarOperador">
+                <div class="mb-3">
+                  <label for="cadastrar_nomeoperador" class="form-label">Nome</label>
+                  <input type="text" class="form-control" id="cadastrar_nomeoperador" name="cadastrar_nomeoperador">
+                </div>
+                <div class="mb-3">
+                  <label for="cadastrar_loginoperador" class="form-label">Login</label>
+                  <input type="text" class="form-control" id="cadastrar_loginoperador" name="cadastrar_loginoperador">
+                </div>
+                <div class="mb-3">
+                  <label for="passnoperador" class="form-label">Senha</label>
+                  <input type="password" readonly class="form-control" id="passnoperador" name="passnoperador"
+                    placeholder="Senha padrão 'Alares@123'">
+                </div>
+                <button type="submit" class="btn btn-custom w-100">Cadastrar</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Atualizar Operador Card -->
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-4">
+                <img src="/static/img/customer-service-agent.png" alt="" class="me-3"
+                  style="width: 48px; height: 48px;">
+                <h3 class="h5 mb-0">ATUALIZAR OPERADOR</h3>
+              </div>
+              <form method="POST" action="/atualizarOperador">
+                <div class="row mb-3">
+                  <div class="col-6">
+                    <label for="id_operador" class="form-label">Id</label>
+                    <input type="text" class="form-control" id="id_operador" name="id_operador">
+                  </div>
+                  <div class="col-6">
+                    <label for="fila_operador" class="form-label">Fila</label>
+                    <input type="text" class="form-control" id="fila_operador" name="fila_operador">
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="cadastrar_nomeoperador" class="form-label">Nome</label>
+                  <input type="text" class="form-control" id="cadastrar_nomeoperador" name="cadastrar_nomeoperador">
+                </div>
+                <div class="mb-3">
+                  <label for="cadastrar_loginoperador" class="form-label">Login</label>
+                  <input type="text" class="form-control" id="cadastrar_loginoperador" name="cadastrar_loginoperador">
+                </div>
+                <div class="mb-3">
+                  <label for="passnoperador" class="form-label">Senha</label>
+                  <input type="password" class="form-control" id="passnoperador" name="passnoperador"
+                    placeholder="Senha padrão 'Alares@123'">
+                </div>
+                <button type="submit" class="btn btn-custom w-100">Atualizar</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tables Section -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-4">
+                <img src="/static/img/behavior.png" alt="" class="me-3" style="width: 48px; height: 48px;">
+                <h3 class="h5 mb-0">ATUALIZAR FILAS EM LOTE - VOZ</h3>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <button type="button" class="btn btn-danger" onclick="carregarQuadro()">
+                  Carregar Quadro
+                </button>
+                <select name="filas" id="filas_id"
+                  style="border-radius: 10px; border: solid 4px #04fb94; margin-left: 10px; text-align: center;">
+                  <option value="">Selecione uma fila</option>
+                  <option value="CHAT">CHAT</option>
+                  <option value="MULTISKILL">MULTISKILL</option>
+                  <option value="SAC">SAC</option>
+                  <option value="WEBBY">WEBBY</option>
+                  <option value="ALARES SAC + WEBBY MULTISKILL">ALARES SAC + WEBBY MULTISKILL</option>
+                  <option value="MULTI ALARES + SAC WEBBY">MULTI ALARES + SAC WEBBY</option>
+                </select>
+                <div class="d-flex align-items-center gap-3">
+                  <button type="button" class="btn btn-custom" onclick="reset_filas()">
+                    Resetar Filas
+                  </button>
+                </div>
+              </div>
+              <table id="tbody" class="table table-striped table-bordered w-100">
+                <thead class="table-primary">
+                  <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Login</th>
+                    <th>Grupo Atendimento</th>
+                    <th>Tipo Atendimento</th>
+                    <th>Check</th>
+                  </tr>
+                </thead>
+                <tfoot>
+                  <tr>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                  </tr>
+                </tfoot>
+                <tbody style="font-size: 12px;">
+
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Update Section -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-4">
+                <img src="/static/img/behavior.png" alt="" class="me-3" style="width: 48px; height: 48px;">
+                <h3 class="h5 mb-0">ATUALIZAR FILAS EM LOTE - CHAT</h3>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <button type="button" class="btn btn-danger" onclick="carregarUSO()">
+                  Carregar Quadro
+                </button>
+                <div class="d-flex align-items-center gap-3">
+                  <button type="button" class="btn btn-custom" id="btnAtualizarUSO" onclick="reset_filas_uso()">
+                    Resetar Filas
+                  </button>
+                  <input type="number" class="form-control" style="width: 100px;" name="qtd_telas" id="qtd_telas"
+                    min="0" max="10" placeholder="Qtd. Telas">
+                </div>
+              </div>
+              <div class="course-box">
+                <div class="box">
+                  <table id="tbody_uso" class="sortable table table-striped table-bordered "
+                    style="text-align: center; width: -webkit-fill-available;">
+                    <thead style="font-size: 12px; background-color: #555cfb; color: #fff; margin-top: 5px;">
+                      <tr>
+                        <th>ID Plataforma</th>
+                        <th>ID Agente</th>
+                        <th>Nome</th>
+                        <th>Nome Formatado</th>
+                        <th>Check</th>
+                      </tr>
+                    </thead>
+                    <tfoot>
+                      <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                      </tr>
+                    </tfoot>
+                    <tbody style="font-size: 12px;">
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Seus scripts existentes -->
+  <script src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      var table = $('#tbody').DataTable({
+        "language": {
+          "sEmptyTable": "Nenhum registro encontrado",
+          "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+          "sInfoPostFix": "",
+          "sInfoThousands": ".",
+          "sLengthMenu": "Mostrar _MENU_ resultados por página",
+          "sLoadingRecords": "Carregando...",
+          "sProcessing": "Processando...",
+          "sZeroRecords": "Nenhum registro encontrado",
+          "sSearch": "Pesquisar",
+          "oPaginate": {
+            "sNext": "Próximo",
+            "sPrevious": "Anterior",
+            "sFirst": "Primeiro",
+            "sLast": "Último"
+          },
+          "oAria": {
+            "sSortAscending": ": Ordenar colunas de forma ascendente",
+            "sSortDescending": ": Ordenar colunas de forma descendente"
+          },
+          "select": {
+            "rows": {
+              "_": "Selecionado %d linhas",
+              "0": "Nenhuma linha selecionada",
+              "1": "Selecionado 1 linha"
+            }
+          }
+        },
+        initComplete: function () {
+          // Adiciona os filtros nas colunas especificadas
+          this.api().columns([3, 4, 5]).every(function () {
+            var column = this;
+            var input = $('<input type="text"  placeholder="Filtrar ' + $(column.header()).text() + '" />')
+              .appendTo($(column.footer()).empty())
+              .on('keyup change clear', function () {
+                if (column.search() !== this.value) {
+                  column.search(this.value).draw();
+                }
+              });
+          });
+          this.api().columns([5]).every(function () {
+            var column = this;
+            var checkbox = $('<input type="checkbox" id="select-all" style="margin-left: 5px;">')
+              .appendTo($(column.footer()).empty())
+              .on('change', function () {
+                // Lógica para selecionar/deselecionar todos
+                var checked = this.checked;
+                $('input[type="checkbox"]').prop('checked', checked);
+              });
+          });
+        }
+      });
+    }); 
+  </script>
+
+
+  <script>
+    $(document).ready(function () {
+      var table = $('#tbody_uso').DataTable({
+        "language": {
+          "sEmptyTable": "Nenhum registro encontrado",
+          "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+          "sInfoPostFix": "",
+          "sInfoThousands": ".",
+          "sLengthMenu": "Mostrar _MENU_ resultados por página",
+          "sLoadingRecords": "Carregando...",
+          "sProcessing": "Processando...",
+          "sZeroRecords": "Nenhum registro encontrado",
+          "sSearch": "Pesquisar",
+          "oPaginate": {
+            "sNext": "Próximo",
+            "sPrevious": "Anterior",
+            "sFirst": "Primeiro",
+            "sLast": "Último"
+          },
+          "oAria": {
+            "sSortAscending": ": Ordenar colunas de forma ascendente",
+            "sSortDescending": ": Ordenar colunas de forma descendente"
+          },
+          "select": {
+            "rows": {
+              "_": "Selecionado %d linhas",
+              "0": "Nenhuma linha selecionada",
+              "1": "Selecionado 1 linha"
+            }
+          }
+        },
+        initComplete: function () {
+          // Adiciona os filtros nas colunas especificadas
+          this.api().columns([0, 1, 2, 3]).every(function () {
+            var column = this;
+            var input = $('<input type="text" placeholder="Filtrar ' + $(column.header()).text() + '" />')
+              .appendTo($(column.footer()).empty())
+              .on('keyup change clear', function () {
+                if (column.search() !== this.value) {
+                  column.search(this.value).draw();
+                }
+              });
+          });
+          this.api().columns([4]).every(function () {
+            var column = this;
+            var checkbox = $('<input type="checkbox" id="select-all" style="margin-left: 5px;">')
+              .appendTo($(column.footer()).empty())
+              .on('change', function () {
+                // Lógica para selecionar/deselecionar todos
+                var checked = this.checked;
+                $('input[type="checkbox"]').prop('checked', checked);
+              });
+          });
+        }
+      });
+    });          
+  </script>
+  <script>
+    function carregarQuadro() {
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Operadores Carregados!",
+        showConfirmButton: false,
+        timer: 1500,
+        willClose: () => {
+          carregar_Quadro();
+          console.log("Quadro carregado com sucesso!"); // Exemplo de lógica
+        }
+      });
+    }
+  </script>
+
+  <script>
+    function carregarUSO() {
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Operadores Carregados!",
+        showConfirmButton: false,
+        timer: 1500,
+        willClose: () => {
+          carregar_operadoresUSO();
+          console.log("Quadro USO carregado com sucesso!"); // Exemplo de lógica
+        }
+      });
+    }
+  </script>
+
+  <script>
+    function carregarUSOreset() {
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Operadores Resetados!",
+        showConfirmButton: false,
+        timer: 1500,
+        willClose: () => {
+          reset_filas_uso();
+          console.log("Operadores USO Resetado com sucesso!"); // Exemplo de lógica
+        }
+      });
+    }
+  </script>
+
+  <script>
+    function reset_filas() {
+      const filasSelecionada = document.getElementById('filas_id').value;
+
+      // Configuração base do Swal.fire
+      const alertaConfig = {
+        position: "top-end",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500
+      };
+
+      switch (filasSelecionada) {
+        case "CHAT":
+          Swal.fire({
+            ...alertaConfig,
+            title: "Resetando Fila CHAT!",
+            willClose: () => reset_chat()
+          });
+          break;
+
+        case "MULTISKILL":
+          Swal.fire({
+            ...alertaConfig,
+            title: "Resetando Fila MULTISKILL!",
+            willClose: () => reset_multiskill()
+          });
+          break;
+
+        case "SAC":
+          Swal.fire({
+            ...alertaConfig,
+            title: "Resetando Fila SAC!",
+            willClose: () => reset_sac()
+          });
+          break;
+
+        case "WEBBY":
+          Swal.fire({
+            ...alertaConfig,
+            title: "Resetando Fila WEBBY!",
+            willClose: () => reset_webby()
+          });
+          break;
+
+        case "ALARES SAC + WEBBY MULTISKILL":
+          Swal.fire({
+            ...alertaConfig,
+            title: "Resetando Fila ALARES SAC + WEBBY!",
+            willClose: () => reset_alares_webby()
+          });
+          break;
+
+        case "MULTI ALARES + SAC WEBBY":
+          Swal.fire({
+            ...alertaConfig,
+            title: "Resetando MULTI ALARES + SAC WEBBY!",
+            willClose: () => reset_multi_sac()
+          });
+          break;
+
+        default:
+          Swal.fire({
+            position: "top-end",
+            icon: "warning",
+            title: "Selecione uma fila!",
+            showConfirmButton: false,
+            timer: 1500
+          });
+      }
+    }
+  </script>
+</body>
+
+</html>

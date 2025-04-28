@@ -1,0 +1,446 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700");
+*{
+  margin: 0;
+  padding: 0;
+  outline: none;
+  border: none;
+  text-decoration: none;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+body{
+  background: #dfe9f5;
+}
+.container{
+  display: flex;
+}
+nav{
+  position: relative;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: #fff;
+  width: 280px;
+  overflow: hidden;
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+}
+.logo{
+  text-align: center;
+  display: flex;
+  margin: 10px 0 0 10px;
+}
+
+h1:hover{
+  color: #00fa97;
+  cursor: pointer;
+}
+.logo img{
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+}
+.logo span{
+  font-weight: bold;
+  padding-left: 15px;
+  font-size: 18px;
+  text-transform: uppercase;
+}
+a{
+  position: relative;
+  color: rgb(85, 83, 83);
+  font-size: 14px;
+  display: table;
+  width: 280px;
+  padding: 10px;
+}
+nav .fas{
+  position: relative;
+  width: 70px;
+  height: 40px;
+  top: 14px;
+  font-size: 20px;
+  text-align: center;
+}
+.nav-item{
+  position: relative;
+  top: 12px;
+  margin-left: 10px;
+}
+a:hover{
+  background: #eee;
+}
+.logout{
+  position: absolute;
+  bottom: 0;
+}
+
+/* Main Section */
+.main{
+  position: relative;
+  padding: 20px;
+  width: 100%;
+}
+.main-top{
+  display: flex;
+  width: 100%;
+    background: #fff;
+    text-align: center;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+  }
+
+.main-top i{
+  position: absolute;
+  right: 0;
+  margin: 10px 30px;
+  color: rgb(110, 109, 109);
+  cursor: pointer;
+}
+.main-skills{
+  display: flex;
+}
+.main-skills .card{
+  width: 100%;
+  margin: 10px;
+  background: #fff;
+  text-align: center;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+}
+.main-skills .card h3{
+  margin: 10px;
+  text-transform: capitalize;
+}
+.main-skills .card p{
+  font-size: 12px;
+}
+.main-skills .card button{
+  background: orangered;
+  color: #fff;
+  padding: 7px 15px;
+  border-radius: 10px;
+  margin-top: 15px;
+  cursor: pointer;
+}
+.main-skills .card button:hover{
+  background: rgba(223, 70, 15, 0.856);
+}
+.main-skills .card i{
+  font-size: 22px;
+  padding: 10px;
+}
+
+/* Courses */
+.main-course{
+  margin-top:20px ;
+  text-transform: capitalize;
+}
+.course-box{
+  width: 100%;
+  padding: 10px 10px 30px 10px;
+  margin-top: 10px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+}
+.course-box ul{
+  list-style: none;
+  display: flex;
+}
+.course-box ul li{
+  margin: 10px;
+  color: gray;
+  cursor: pointer;
+}
+.course-box ul .active{
+  color: #000;
+  border-bottom: 1px solid #000;
+}
+.course-box .course{
+  display: flex;
+}
+
+
+.box1{
+  width: 150%;
+  margin: 10px;
+  border-radius: 10px;
+  background: rgb(234, 233, 235);
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+}
+.box{
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 10px;
+  background: rgb(234, 233, 235);
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+}
+
+.box p{
+  font-size: 12px;
+  margin-top: 5px;
+}
+.box button{
+  background: #000;
+  color: #fff;
+  padding: 7px 10px;
+  border-radius: 10px;
+  margin-top: 3rem;
+  cursor: pointer;
+}
+.box button:hover{
+  background: rgba(0, 0, 0, 0.842);
+}
+
+.box i{
+  font-size: 7rem;
+  float: right;
+  margin: -20px 20px 20px 0;
+}
+.html{
+  color: rgb(25, 94, 54);
+}
+.css{
+  color: rgb(104, 179, 35);
+}
+.js{
+  color: rgb(28, 98, 179);
+}
+
+p h4{
+  font-size: 12px;
+  display: flex;
+}
+
+
+input[type="search"] {
+  background-color: #525252;
+  color: #00fa97;
+  border-radius: 5px;
+  height: 25px;
+}
+
+label {
+  color: #6b50ff;
+  font-size: 12px;
+}
+.col-12{
+  text-align:justify
+}
+.form-label{
+  text-align: left;
+  justify-content: left;
+}
+.form-control{
+  width: 100%;
+  border-bottom: solid 2px #525252;
+  background-color: #f7f7f7;
+  font-size: 15px;
+  border-radius: 5px;
+}
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #00fa97 #6b50ff;
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 13px;
+  margin-left: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #6b50ff;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #00fa97;
+  border: 0px solid #ffffff;
+}
+
+input[type="date"] {
+  position: relative;
+  background-color: #00fa97;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  font-size: 18px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  left: 74px;
+  color: #1a1a1a;
+}
+
+
+#inputGroupFileAddon03 {
+  color: #6b50ff;
+  font-weight: bold;
+  border: none;
+}
+
+#inputGroupFileAddon03:hover {
+  background-color: #6b50ff;
+  font-weight: bold;
+  border: none;
+}
+
+.warning {
+  position: fixed;
+  left: 49%;
+  top: 80%;
+  width: 50%;
+  padding: 4px 12px;
+  animation: alertAnimation 15s ease-in-out infinite;
+  opacity: 0;
+  background-color: #ffffcc;
+  border-left: 6px solid #ffeb3b;
+}
+
+@keyframes alertAnimation {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+#render_grafico {
+  width: 100%;
+  transition: all 0.3s ease-in-out;
+  padding: 0.5rem;
+  overflow-y: auto;
+}
+
+/* Ajustar a largura das colunas da tabela */
+table {
+  width: 100%; /* Garante que a tabela ocupe 100% da largura do contêiner */
+  border-collapse: collapse; /* Remove espaços entre as células */
+}
+
+th, td {
+  padding: 10px; /* Adiciona padding para as células */
+  text-align: center; /* Centraliza o texto */
+  border: 1px solid #ddd; /* Adiciona bordas às células */
+}
+
+/* Ajustes específicos para colunas */
+th:nth-child(1),
+td:nth-child(1) {
+  width: 50px; /* Largura fixa para a coluna de ID */
+}
+
+th:nth-child(2),
+td:nth-child(2) {
+  width: 200px; /* Largura fixa para a coluna Nome */
+}
+
+th:nth-child(3),
+td:nth-child(3) {
+  width: 150px; /* Largura fixa para a coluna Login */
+}
+
+th:nth-child(4),
+td:nth-child(4) {
+  width: 150px; /* Largura fixa para a coluna Grupo Atendimento */
+}
+
+th:nth-child(5),
+td:nth-child(5) {
+  width: 150px; /* Largura fixa para a coluna Tipo Atendimento */
+}
+
+th:nth-child(6),
+td:nth-child(6) {
+  width: 100px; /* Largura fixa para a coluna Check */
+}
+
+/* Estilização da paginação */
+.dataTables_wrapper .dataTables_paginate {
+  padding: 10px; /* Adiciona padding */
+  text-align: right; /* Centraliza a paginação */
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  padding: 5px 10px; /* Ajusta padding dos botões de paginação */
+  margin: 0 5px; /* Espaçamento entre botões */
+  border-radius: 4px; /* Bordas arredondadas */
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background-color: #00fa97; /* Cor de fundo do botão atual */
+  color: white; /* Cor do texto do botão atual */
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background-color: #00b77c; /* Cor de fundo ao passar o mouse */
+  color: white; /* Cor do texto ao passar o mouse */
+}
+.dataTables_length, .dataTables_info{
+  text-align: start;
+}
+.dataTables_filter{
+  margin-bottom: 5px;
+  text-align: right;
+}
+
+.paginate_button {
+  display:inline;
+}
+
+#submenu {
+  position: relative;
+  top: 0px;
+  margin-left: 10px;
+}
+.dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  display: none;
+  left: 0;
+  top: 100%;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  padding: 10px;
+  min-width: 200px;
+  z-index: 1000;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.dropdown-menu li {
+  margin: 5px 0;
+}
+
+.dropdown-menu a {
+  color: #6b50ff;
+  padding: 8px 15px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s;
+}
+
+.dropdown-menu a:hover {
+  background-color: #f5f5f5;
+}
+
+.dropdown-menu i {
+  margin-right: 10px;
+}

@@ -1,0 +1,453 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;1,500&display=swap");
+
+* {
+  padding: 0;
+  margin: 0;
+  vertical-align: baseline;
+  list-style: none;
+  border: 0;
+}
+
+body,
+html {
+  height: 100%;
+}
+
+#geral {
+  height: 250vh;
+  background-color: #2b2b2b; /* Cor de fundo desejada */
+}
+#barra-lateral {
+  height: 250vh;
+}
+
+#Report1 {
+  display: flex;
+  width: 100%;
+}
+
+img{
+  margin-top: 10px;
+}
+#mensagem img {
+  max-width: 100px;
+  margin-bottom: 10px;
+  position: fixed;
+  top: 82%;
+  transform: translateY(-50%);
+  right: 29;
+}
+#total,
+#atendidas,
+#abandonadas,
+#tme,
+#tma,
+#espera,
+#chamando,
+#pausados {
+  width: 100%;
+  height: 150px;
+  margin: 5px;
+  box-shadow: 7px 7px 13px 0px rgba(50, 50, 50, 0.22);
+  transition: all 0.3s ease-in-out;
+  background-color: #272727;
+  font-size: 25px;
+  font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
+  text-align: center;
+  color: #6b50ff;
+}
+#pca {
+  width: 100%;
+  height: 150px;
+  margin: 5px;
+  box-shadow: 7px 7px 13px 0px rgba(50, 50, 50, 0.22);
+  transition: all 0.3s ease-in-out;
+  background-color: #6b50ff;
+  font-size: 25px;
+  font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
+  text-align: center;
+  color: #00fa97;
+}
+
+#pcacor1 {
+  width: 100%;
+  height: 150px;
+  margin: 5px;
+  box-shadow: 7px 7px 13px 0px rgba(50, 50, 50, 0.22);
+  transition: all 0.3s ease-in-out;
+  background-color: #f0c245;
+  font-size: 25px;
+  font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
+  text-align: center;
+  color: rgb(255, 255, 255);
+}
+
+#pcacor2 {
+  width: 100%;
+  height: 150px;
+  margin: 5px;
+  box-shadow: 7px 7px 13px 0px rgba(50, 50, 50, 0.22);
+  transition: all 0.3s ease-in-out;
+  background-color: #41d19a;
+  font-size: 25px;
+  font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
+  text-align: center;
+  color: rgb(255, 255, 255);
+}
+
+#pcacor3 {
+  width: 100%;
+  height: 150px;
+  margin: 5px;
+  box-shadow: 7px 7px 13px 0px rgba(50, 50, 50, 0.22);
+  transition: all 0.3s ease-in-out;
+  background-color: #ff5c50;
+  font-size: 25px;
+  font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
+  text-align: center;
+  color: rgb(255, 255, 255);
+}
+
+#espera,
+#chamando,
+#pausados,
+#pca {
+  font-size: 30px;
+}
+
+#pausados:hover {
+  color: #00fa97;
+}
+
+#valor_recebidas,
+#valor_atendidas,
+#valor_aband {
+  font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
+  font-size: 70px;
+  color: rgb(255, 255, 255);
+}
+#valor_tme {
+  font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
+  font-size: 40px;
+  color: rgb(255, 255, 255);
+}
+
+#valor_tma {
+  font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
+  font-size: 40px;
+  color: rgb(255, 255, 255);
+}
+
+#valor_pca {
+  font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
+  font-size: 70px;
+  color: rgb(255, 255, 255);
+}
+#valor_espera,
+#valor_chamando,
+#valor_pausado {
+  font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
+  font-size: 70px;
+  color: rgb(255, 255, 255);
+}
+#barra-lateral {
+  background-color: #272727;
+}
+
+#titulo_gráfico,
+#titulo_pausados,
+#ofensores_tma {
+  font-size: 20px;
+  margin-left: 5px;
+  color: #6b50ff;
+  font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
+}
+#grafico,
+#card1 {
+  width: 104%;
+  height: 400px;
+  margin: 5px;
+  transition: all 0.3s ease-in-out;
+  background-color: #272727;
+  padding: 0.5rem;
+  overflow-y: auto;
+}
+
+#operadores_pausado {
+  width: 51.2%;
+  margin: 5px;
+  transition: all 0.3s ease-in-out;
+  background-color: #272727;
+  padding: 0.5rem;
+}
+
+#realtime {
+  width: 100%;
+  height: 150px;
+  margin: 5px;
+  border-radius: 15px;
+  transition: all 0.3s ease-in-out;
+  background-color: rgb(255, 255, 255);
+}
+
+#card2 {
+  width: 100%;
+  height: 400px;
+  margin: 5px;
+  display: flex;
+  border-radius: 15px;
+  transition: all 0.3s ease-in-out;
+  background-color: rgb(255, 255, 255);
+  padding: 0.5rem;
+}
+
+#b_geral {
+  color: #6b50ff;
+}
+#b_geral:hover {
+  color: #00fa97;
+}
+
+#b_grafico,
+#b_pesquisa {
+  color: #6b50ff;
+}
+
+#b_produtividade {
+  color: #6b50ff;
+}
+
+#b_produtividade:hover,
+#b_pesquisa:hover,
+#b_grafico:hover {
+  color: #00fa97;
+}
+
+#tabela_group1{
+  display: flex;
+}
+.red{
+  background-color: rgb(255, 70, 70);
+  color: #ededed;
+}
+#tabelalogados {
+  margin: 5px;
+  transition: all 0.3s ease-in-out;
+  background-color: #272727;
+  padding: 0.5rem;
+  text-align: center;
+  align-items: center;
+  width: 50%;
+}
+
+#alertas {
+  height: 50px;
+  margin: 5px;
+  transition: all 0.3s ease-in-out;
+  background-color: #272727;
+  font-size: 25px;
+  font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
+  text-align: center;
+  color: #00fa97;
+  align-items: center;
+}
+
+#total_consolidadoSAC,
+#atendidas_consolidadoSAC,
+#pca_consolidadoSAC,
+#abandonadas_consolidadoSAC,
+#tme_consolidadoSAC,
+#tma_consolidadoSAC,
+#total_consolidadoHD,
+#atendidas_consolidadoHD,
+#pca_consolidadoHD,
+#abandonadas_consolidadoHD,
+#tme_consolidadoHD,
+#tma_consolidadoHD {
+  font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
+  font-size: 40px;
+  color: rgb(255, 255, 255);
+}
+input[type="search"] {
+  background-color: #525252;
+  color: #00fa97;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-size: 20px;
+  border: none;
+  border-radius: 5px;
+  height: 25px;
+}
+
+#tbody_info,#tbody1_info,
+#tbody_paginate,#tbody1_paginate,#tbody1_previous,#tbody1_next {
+  color: #6b50ff;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
+#tbody,#tbody1{
+  color: #00fa97;
+}
+
+label {
+  color: #6b50ff;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #00fa97 #6b50ff;
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 13px;
+  margin-left: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #6b50ff;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #00fa97;
+  border: 0px solid #ffffff;
+}
+
+.card {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 0px solid rgba(0, 0, 0, 0);
+  border-radius: 0.25rem;
+  margin-top: 20px;
+  box-shadow: 0 2px 6px 0 rgb(218 218 253 / 65%),
+    0 2px 6px 0 rgb(206 206 238 / 54%);
+}
+
+.update_ret_card {
+  font-size: 10px;
+  position: relative;
+  right: 10px;
+  top: -30px;
+  margin-right: 10px;
+}
+.widgets-icons-2 {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ededed;
+  font-size: 27px;
+  border-radius: 10px;
+}
+
+.bg-gradient-bloody {
+  background: #272b33;
+  background: -webkit-linear-gradient(45deg, #272b33, #555555) !important;
+  background: linear-gradient(45deg, #272b33, #555555) !important;
+}
+
+.bg-gradient-ohhappiness {
+  background: #272b33;
+  background: -webkit-linear-gradient(45deg, #272b33, #555555) !important;
+  background: linear-gradient(45deg, #272b33, #555555) !important;
+}
+
+.bg-gradient-blooker {
+  background: #272b33;
+  background: -webkit-linear-gradient(45deg, #272b33, #555555) !important;
+  background: linear-gradient(45deg, #272b33, #555555) !important;
+}
+input[type="date"] {
+  position: relative;
+  background-color: #00fa97;
+  transform: translate(-50%, -50%);
+  font-family: "Nunito", monospace;
+  color: #ffffff;
+  font-size: 18px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  left: 74px;
+  color: #1a1a1a;
+}
+.data1 {
+  margin-top: 30px;
+  position: absolute;
+  margin-left: 15px;
+}
+
+#inputGroupFileAddon03 {
+  color: #6b50ff;
+  font-weight: bold;
+  border: none;
+}
+
+#inputGroupFileAddon03:hover {
+  background-color: #6b50ff;
+  color: #00fa97;
+  font-weight: bold;
+  border: none;
+}
+
+#alerta1 {
+  position: fixed;
+  left: 49%;
+  top: 80%;
+  width: 50%;
+  animation: alertAnimation 15s ease-in-out infinite;
+  opacity: 0;
+}
+
+@keyframes alertAnimation {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+
+
+#atendidas_consolidadoHD,
+#atendidas_consolidadoSAC,
+#atendidas_consolidadoWEBBY {
+  display: flex;
+  justify-content: center;
+  font-size: 15px;
+}
+
+#abandonadas_consolidadoHD,
+#abandonadas_consolidadoSAC,
+#abandonadas_consolidadoWEBBY,
+#pca_consolidadoHD,
+#pca_consolidadoSAC,
+#pca_consolidadoWEBBY,
+#tme_consolidadoHD,
+#tme_consolidadoSAC,
+#tme_consolidadoWEBBY,
+#tma_consolidadoHD,
+#tma_consolidadoSAC,
+#tma_consolidadoWEBBY {
+  display: flex;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.swal2-popup {
+  position: inherit;
+}
