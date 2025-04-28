@@ -1,185 +1,274 @@
-<span style="font-family: verdana, geneva, sans-serif;">
-    <!DOCTYPE html>
-    <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 
-    <head>
-        <meta charset="utf-8" initial-scale=0.5>
-        <title>Dashboard Planejamento</title>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='/css/indexSentimento_USO.css') }}">
-        <script src="{{url_for('static', filename='/js/index.js')}}"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-        <link rel="icon" type="image/jpg" href="{{ url_for('static', filename='/img/alaresVERDE.png') }}">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-            integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
-            crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <script src='https://cdn.plot.ly/plotly-2.27.0.min.js'></script>
-        <script src="https://code.jquery.com/jquery-3.7.1.slim.js"
-            integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Planejamento</title>
 
-    <!--CSS-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!--JS-->
-    <script src="{{url_for('static', filename='/assets/js/color-modes.js')}}"></script>
-    <script src="{{url_for('static', filename='/assets/dist/js/bootstrap.bundle.min.js')}}"></script>
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{ url_for('static', filename='/js/quadro.js') }}"></script>
+  <script src='https://cdn.plot.ly/plotly-2.27.0.min.js'></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://cdn.datatables.net/2.1.2/js/dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/2.1.2/js/dataTables.bootstrap5.min.js"></script>
 
+  <!-- Custom CSS -->
+  <style>
+    :root {
+      --primary-color: #5D5CDE;
+      --sidebar-bg: #1a1f36;
+      --card-bg: #ffffff;
+    }
 
-    <!--Tabela-->
-    <link href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css" rel="stylesheet">
-    <link href="//cdn.datatables.net/select/1.3.3/css/select.dataTables.min.css" rel="stylesheet">
-    </head>
+    /* Sidebar styles */
+    .sidebar {
+      background-color: var(--sidebar-bg);
+      width: 280px;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      transition: 0.3s;
+      z-index: 1000;
+    }
 
-    <body>
-        <div class="container">
-            <nav>
-                <ul>
-                    <li><a href="#" class="logo">
-                            <img src="/static/img/pngwing.com.png" alt=""
-                                style="    border: 3px solid #6b50ff;border-radius: 50%;">
-                            <span class="nav-item" style="color: #6b50ff;">DashBoard</span>
-                        </a></li>
-                    <li><a href="home">
-                            <i class="fas fa-home"></i>
-                            <span class="nav-item">Home</span>
-                        </a></li>
-                    <li><a href="painelVoz">
-                            <i class="fas fa-chart-line"></i>
-                            <span class="nav-item">Dash</span>
-                        </a></li>
-                    <li><a href="">
-                            <i class="fas fa-wallet"></i>
-                            <span class="nav-item">Wallet</span>
-                        </a></li>
-                    <li><a href="massivas">
-                            <i class="fas fa-circle-exclamation"></i>
-                            <span class="nav-item">Massivas</span>
-                        </a></li>
-                    <li><a href="clientesUSO">
-                            <i class="fas fa-comment""></i>
-                <span class=" nav-item">Sent. Uso
-</span>
-</a></li>
-<li><a href="encerramentoUSO">
-        <i class="fas fa-cog"></i>
-        <span class="nav-item">Enc. Uso</span>
-    </a></li>
-<li><a href="">
-        <i class="fas fa-question-circle"></i>
-        <span class="nav-item">Help</span>
-    </a></li>
-<li><a href="" class="logout">
-        <i class="fas fa-sign-out-alt"></i>
-        <span class="nav-item">Log out</span>
-    </a></li>
-</ul>
-</nav>
+    .sidebar-collapsed {
+      margin-left: -280px;
+    }
 
-<section class="main">
-    <div class="main-top">
-        <h1 style="font-size: 20px; color:#6b50ff;">SENTIMENTO USO</h1>
-        <i class="fas fa-user-cog"></i>
+    .sidebar-header {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-menu {
+      padding: 1rem 0;
+    }
+
+    .sidebar-item {
+      padding: 0.75rem 1rem;
+      color: #fff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      transition: 0.3s;
+    }
+
+    .sidebar-item:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-icon {
+      margin-right: 1rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* Main content */
+    .main-content {
+      margin-left: 280px;
+      padding: 2rem;
+      transition: 0.3s;
+    }
+
+    .main-content-expanded {
+      margin-left: 0;
+    }
+
+    /* Toggle button */
+    .sidebar-toggle {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1001;
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        margin-left: -280px;
+      }
+
+      .sidebar-toggle {
+        display: block;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .sidebar.show {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Sidebar Toggle Button -->
+  <button class="btn btn-primary sidebar-toggle" id="sidebarToggle">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="d-flex align-items-center">
+        <img src="/static/img/pngwing.com.png" alt="Logo" class="rounded-circle me-2"
+          style="width: 50px; height: 50px; border: 3px solid #6b50ff;">
+        <h5 class="text-white mb-0">DASHBOARD</h5>
+      </div>
     </div>
 
-    <div class="main-skills">
+    <div class="sidebar-menu">
+      <p class="text-secondary small text-center mb-3">MAIN MENU</p>
+      <div class="nav flex-column">
+        <a href="home" class="sidebar-item">
+          <i class="fas fa-home sidebar-icon"></i>
+          <span>Home</span>
+        </a>
 
-        <div class="card">
-            <div>
-                <img src="/static/img/service.png" alt="" srcset="" style="width: 45px; height: 45px;">
-            </div>
-            <h3>SENTIMENTO USO</h3>
-            <div style="border-top: solid 2px #6b50ff;"></div>
+        <a href="painelVoz" class="sidebar-item">
+          <i class="fas fa-chart-line sidebar-icon"></i>
+          <span>Dash</span>
+        </a>
 
-            <div id="100%" style="display: flex; width: 100%; height: 50ch; ">
-                <form action="/upload" method="post" enctype="multipart/form-data">
+        <a href="mapa" class="sidebar-item">
+          <i class="fas fa-map-location-dot sidebar-icon"></i>
+          <span>Mapa</span>
+        </a>
 
-                    <input type="file" name="file" id="inputGroupFileAddon03">
-                    <input type="submit" value="Enviar"
-                        style="width: 100px; font-weight: bold; border-radius: 3px; border: none; cursor: pointer; background-color: #6b50ff; color: aliceblue;">
-                </form>
-                <img src="/static/img/wordcloud_output.png">
-            </div>
-            <table id="tbody1" class="table sortable" style="text-align: center;">
-                <thead>
+        <a href="/" class="sidebar-item">
+          <i class="fas fa-circle-exclamation sidebar-icon"></i>
+          <span>Massivas</span>
+        </a>
+
+        <a href="clientesUSO" class="sidebar-item">
+          <i class="fa-solid fa-comment sidebar-icon"></i>
+          <span>Sent. CHAT</span>
+        </a>
+
+        <a href="analiseTickets" class="sidebar-item">
+          <i class="fa-solid fa-ticket-alt sidebar-icon"></i>
+          <span>Análise CHAT</span>
+        </a>
+
+        <a href="encerramentoUSO" class="sidebar-item">
+          <i class="fa-solid fa-cog sidebar-icon"></i>
+          <span>Enc. CHAT</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container-fluid py-4">
+      <!-- Header -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <h2 class="text-center fw-bold">SENTIMENTO USO</h2>
+        </div>
+      </div>
+
+      <!-- Content Section -->
+      <div class="row">
+        <div class="col-12">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-4">
+                <img src="/static/img/service.png" alt="" class="me-3" style="width: 45px; height: 45px;">
+                <h3 class="h5 mb-0">SENTIMENTO USO</h3>
+              </div>
+              <div class="border-top border-primary mb-4"></div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <form action="/upload" method="post" enctype="multipart/form-data" class="mb-4">
+                    <div class="mb-3">
+                      <input type="file" name="file" id="inputGroupFileAddon03" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                  </form>
+                </div>
+                <div class="col-md-6">
+                  <img src="/static/img/wordcloud_output.png" alt="Word Cloud" class="img-fluid">
+                </div>
+              </div>
+
+              <div class="table-responsive">
+                <table id="tbody1" class="table table-striped table-bordered">
+                  <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Conversa</th>
-                        <th>Ideia Central</th>
+                      <th>ID</th>
+                      <th>Conversa</th>
+                      <th>Ideia Central</th>
                     </tr>
-                </thead>
-                <tbody>
+                  </thead>
+                  <tbody>
                     {% for record in df_records %}
                     <tr>
-                        <td>{{ record['ID'] }}</td>
-                        <td>{{ record['CONVERSA'] }}</td>
-                        <td>{{ record['Ideia Central'] }}</td>
+                      <td>{{ record['ID'] }}</td>
+                      <td>{{ record['CONVERSA'] }}</td>
+                      <td>{{ record['Ideia Central'] }}</td>
                     </tr>
                     {% endfor %}
-                </tbody>
-            </table>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <div>
-        </div>
+      </div>
     </div>
-    </div>
+  </main>
 
-    </html>
-    </span>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.slim.js"
-      integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script>
-    <script src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+  <!-- DataTables JS -->
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 
-    <script>
-        $(document).ready(function () {
-          var table = $('#tbody1').DataTable({
-            "language": {
-              "sEmptyTable": "Nenhum registro encontrado",
-              "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
-              "sInfoPostFix": "",
-              "sInfoThousands": ".",
-              "sLengthMenu": "Mostrar _MENU_ resultados por página",
-              "sLoadingRecords": "Carregando...",
-              "sProcessing": "Processando...",
-              "sZeroRecords": "Nenhum registro encontrado",
-              "sSearch": "Pesquisar",
-              "oPaginate": {
-                "sNext": "Próximo",
-                "sPrevious": "Anterior",
-                "sFirst": "Primeiro",
-                "sLast": "Último"
-              },
-              "oAria": {
-                "sSortAscending": ": Ordenar colunas de forma ascendente",
-                "sSortDescending": ": Ordenar colunas de forma descendente"
-              },
-              "select": {
-                "rows": {
-                  "_": "Selecionado %d linhas",
-                  "0": "Nenhuma linha selecionada",
-                  "1": "Selecionado 1 linha"
-                }
-              }
-            },
-            initComplete: function () {
-              // Adiciona os filtros nas colunas especificadas
-              this.api().columns([4, 5, 6, 7]).every(function () {
-                var column = this;
-                var input = $('<input type="text" placeholder="Filtrar ' + $(column.header()).text() + '" />')
-                  .appendTo($(column.footer()).empty())
-                  .on('keyup change clear', function () {
-                    if (column.search() !== this.value) {
-                      column.search(this.value).draw();
-                    }
-                  });
-              });
-            }
-          });
-        });
-      </script>
-    </body>
+  <!-- Sidebar Toggle Script -->
+  <script>
+    document.getElementById('sidebarToggle').addEventListener('click', function () {
+      document.getElementById('sidebar').classList.toggle('show');
+    });
 
-    </html>
+    $(document).ready(function () {
+      $('#tbody1').DataTable({
+        "language": {
+          "sEmptyTable": "Nenhum registro encontrado",
+          "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+          "sInfoPostFix": "",
+          "sInfoThousands": ".",
+          "sLengthMenu": "Mostrar _MENU_ resultados por página",
+          "sLoadingRecords": "Carregando...",
+          "sProcessing": "Processando...",
+          "sZeroRecords": "Nenhum registro encontrado",
+          "sSearch": "Pesquisar",
+          "oPaginate": {
+            "sNext": "Próximo",
+            "sPrevious": "Anterior",
+            "sFirst": "Primeiro",
+            "sLast": "Último"
+          },
+          "oAria": {
+            "sSortAscending": ": Ordenar colunas de forma ascendente",
+            "sSortDescending": ": Ordenar colunas de forma descendente"
+          }
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

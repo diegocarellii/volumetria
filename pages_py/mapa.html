@@ -108,18 +108,6 @@
                 margin-left: 0;
             }
         }
-
-        .custom-textarea {
-            width: 100%;
-            height: 400px;
-            color: #00fa97;
-            font-size: 35px;
-            background: none;
-            border-radius: 5px;
-            border: solid 1px #00fa97;
-            margin-top: 20px;
-            padding: 10px;
-        }
     </style>
 </head>
 
@@ -186,7 +174,7 @@
             <!-- Header -->
             <div class="row mb-4">
                 <div class="col-12">
-                    <h2 class="text-center fw-bold">Encerramento USO</h2>
+                    <h2 class="text-center fw-bold">Mapa de Calor</h2>
                 </div>
             </div>
 
@@ -195,16 +183,7 @@
                 <div class="col-12">
                     <div class="card shadow-sm">
                         <div class="card-body">
-                            <form action="/encerramento" method="post" enctype="multipart/form-data">
-                                <div class="mb-4">
-                                    <input type="file" name="file" id="inputGroupFileAddon03" class="form-control mb-3">
-                                    <button type="submit" class="btn btn-primary">Enviar</button>
-                                </div>
-                                <div class="mb-3">
-                                    <textarea name="mensagem" id="encerramento" placeholder="Escreva sua mensagem!"
-                                        class="custom-textarea"></textarea>
-                                </div>
-                            </form>
+                            <div id="map" style="height: 600px;"></div>
                         </div>
                     </div>
                 </div>

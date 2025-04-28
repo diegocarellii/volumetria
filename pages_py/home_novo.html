@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
   <meta charset="UTF-8">
@@ -154,6 +154,166 @@
     .form-control:focus {
       border-color: #555cfb;
       box-shadow: 0 0 0 0.2rem rgba(85, 92, 251, 0.25);
+    }
+
+    /* Table Styles */
+    .table {
+      margin-bottom: 0;
+      background-color: #fff;
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+
+    /* DataTables Customization */
+    .dataTables_wrapper .dataTables_filter {
+      float: right;
+      margin-bottom: 1rem;
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+      border: 1px solid #dee2e6;
+      border-radius: 0.375rem;
+      padding: 0.375rem 0.75rem;
+      margin-left: 0.5rem;
+      background-color: #fff;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .dataTables_wrapper .dataTables_filter input:focus {
+      border-color: #555cfb;
+      outline: 0;
+      box-shadow: 0 0 0 0.2rem rgba(85, 92, 251, 0.25);
+    }
+
+    .dataTables_wrapper .dataTables_paginate {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #dee2e6;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+      padding: 0.375rem 0.75rem;
+      margin: 0 0.25rem;
+      border: 1px solid #dee2e6;
+      border-radius: 0.375rem;
+      background-color: #fff;
+      color: #555cfb !important;
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+      background-color: #555cfb !important;
+      border-color: #555cfb;
+      color: #fff !important;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+      background-color: #555cfb !important;
+      border-color: #555cfb;
+      color: #fff !important;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+      color: #6c757d !important;
+      cursor: not-allowed;
+      background-color: #fff !important;
+      border-color: #dee2e6;
+    }
+
+    .dataTables_wrapper .dataTables_length {
+      margin-bottom: 1rem;
+    }
+
+    .dataTables_wrapper .dataTables_length select {
+      border: 1px solid #dee2e6;
+      border-radius: 0.375rem;
+      padding: 0.375rem 0.75rem;
+      margin: 0 0.5rem;
+      background-color: #fff;
+    }
+
+    .dataTables_wrapper .dataTables_info {
+      padding-top: 1rem;
+      color: #6c757d;
+    }
+
+    .table thead th {
+      border-bottom: 2px solid #dee2e6;
+      padding: 1rem;
+      vertical-align: middle;
+    }
+
+    .table tbody td {
+      padding: 0.75rem;
+      vertical-align: middle;
+      font-size: 0.875rem;
+    }
+
+    .table-hover tbody tr:hover {
+      background-color: rgba(85, 92, 251, 0.05);
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    .table-bordered {
+      border: 1px solid #dee2e6;
+    }
+
+    .table-bordered th,
+    .table-bordered td {
+      border: 1px solid #dee2e6;
+    }
+
+    .table-group-divider {
+      border-top: 2px solid #dee2e6;
+    }
+
+    /* Responsive table */
+    @media (max-width: 768px) {
+      .table-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .table {
+        width: 100% !important;
+        margin-bottom: 1rem;
+      }
+
+      .table td,
+      .table th {
+        white-space: normal;
+        word-wrap: break-word;
+        min-width: auto;
+      }
+    }
+
+    /* Ajustes gerais da tabela */
+    .table {
+      width: 100%;
+      table-layout: auto;
+    }
+
+    .table td,
+    .table th {
+      white-space: normal;
+      word-wrap: break-word;
+    }
+
+    /* Ajuste do DataTables para evitar scroll */
+    .dataTables_wrapper {
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    .dataTables_scroll {
+      margin-bottom: 1rem;
+      overflow-x: hidden !important;
     }
 
     /* Responsive */
@@ -341,31 +501,32 @@
                   </button>
                 </div>
               </div>
-              <table id="tbody" class="table table-striped table-bordered w-100">
-                <thead class="table-primary">
-                  <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Login</th>
-                    <th>Grupo Atendimento</th>
-                    <th>Tipo Atendimento</th>
-                    <th>Check</th>
-                  </tr>
-                </thead>
-                <tfoot>
-                  <tr>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                  </tr>
-                </tfoot>
-                <tbody style="font-size: 12px;">
-
-                </tbody>
-              </table>
+              <div class="table-responsive">
+                <table id="tbody" class="table table-striped table-hover table-bordered w-100">
+                  <thead class="table-dark">
+                    <tr>
+                      <th class="text-center">ID</th>
+                      <th class="text-center">Nome</th>
+                      <th class="text-center">Login</th>
+                      <th class="text-center">Grupo Atendimento</th>
+                      <th class="text-center">Tipo Atendimento</th>
+                      <th class="text-center">Check</th>
+                    </tr>
+                  </thead>
+                  <tfoot>
+                    <tr>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                    </tr>
+                  </tfoot>
+                  <tbody class="table-group-divider">
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -394,30 +555,30 @@
               </div>
               <div class="course-box">
                 <div class="box">
-                  <table id="tbody_uso" class="sortable table table-striped table-bordered "
-                    style="text-align: center; width: -webkit-fill-available;">
-                    <thead style="font-size: 12px; background-color: #555cfb; color: #fff; margin-top: 5px;">
-                      <tr>
-                        <th>ID Plataforma</th>
-                        <th>ID Agente</th>
-                        <th>Nome</th>
-                        <th>Nome Formatado</th>
-                        <th>Check</th>
-                      </tr>
-                    </thead>
-                    <tfoot>
-                      <tr>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                      </tr>
-                    </tfoot>
-                    <tbody style="font-size: 12px;">
-
-                    </tbody>
-                  </table>
+                  <div class="table-responsive">
+                    <table id="tbody_uso" class="table table-striped table-hover table-bordered w-100">
+                      <thead class="table-dark">
+                        <tr>
+                          <th class="text-center">ID Plataforma</th>
+                          <th class="text-center">ID Agente</th>
+                          <th class="text-center">Nome</th>
+                          <th class="text-center">Nome Formatado</th>
+                          <th class="text-center">Check</th>
+                        </tr>
+                      </thead>
+                      <tfoot>
+                        <tr>
+                          <th></th>
+                          <th></th>
+                          <th></th>
+                          <th></th>
+                          <th></th>
+                        </tr>
+                      </tfoot>
+                      <tbody class="table-group-divider">
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
@@ -463,6 +624,13 @@
             }
           }
         },
+        "dom": '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rtip',
+        "pageLength": 10,
+        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+        "ordering": true,
+        "responsive": true,
+        "scrollX": false,
+        "autoWidth": false,
         initComplete: function () {
           // Adiciona os filtros nas colunas especificadas
           this.api().columns([3, 4, 5]).every(function () {
@@ -522,6 +690,13 @@
             }
           }
         },
+        "dom": '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rtip',
+        "pageLength": 10,
+        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+        "ordering": true,
+        "responsive": true,
+        "scrollX": false,
+        "autoWidth": false,
         initComplete: function () {
           // Adiciona os filtros nas colunas especificadas
           this.api().columns([0, 1, 2, 3]).every(function () {
