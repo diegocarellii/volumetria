@@ -1,16 +1,28 @@
 @import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;1,500&display=swap");
 
+:root {
+    --gray-100: #f8f9fa;
+    --gray-200: #e9ecef;
+    --gray-300: #dee2e6;
+    --gray-400: #ced4da;
+    --gray-500: #adb5bd;
+    --gray-600: #6c757d;
+    --gray-700: #495057;
+    --gray-800: #343a40;
+    --gray-900: #212529;
+}
+
 * {
-  padding: 0;
-  margin: 0;
-  vertical-align: baseline;
-  list-style: none;
-  border: 0;
+    padding: 0;
+    margin: 0;
+    vertical-align: baseline;
+    list-style: none;
+    border: 0;
 }
 
 body,
 html {
-  height: 100%;
+    height: 100%;
 }
 
 #geral {
@@ -51,7 +63,7 @@ img{
   box-shadow: 7px 7px 13px 0px rgba(50, 50, 50, 0.22);
   transition: all 0.3s ease-in-out;
   background-color: #272727;
-  font-size: 25px;
+  font-size: 35px;
   font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
   text-align: center;
   color: #6b50ff;
@@ -63,7 +75,7 @@ img{
   box-shadow: 7px 7px 13px 0px rgba(50, 50, 50, 0.22);
   transition: all 0.3s ease-in-out;
   background-color: #6b50ff;
-  font-size: 25px;
+  font-size: 35px;
   font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
   text-align: center;
   color: #00fa97;
@@ -76,7 +88,7 @@ img{
   box-shadow: 7px 7px 13px 0px rgba(50, 50, 50, 0.22);
   transition: all 0.3s ease-in-out;
   background-color: #f0c245;
-  font-size: 25px;
+  font-size: 35px;
   font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
   text-align: center;
   color: rgb(255, 255, 255);
@@ -89,7 +101,7 @@ img{
   box-shadow: 7px 7px 13px 0px rgba(50, 50, 50, 0.22);
   transition: all 0.3s ease-in-out;
   background-color: #41d19a;
-  font-size: 25px;
+  font-size: 35px;
   font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
   text-align: center;
   color: rgb(255, 255, 255);
@@ -102,7 +114,7 @@ img{
   box-shadow: 7px 7px 13px 0px rgba(50, 50, 50, 0.22);
   transition: all 0.3s ease-in-out;
   background-color: #ff5c50;
-  font-size: 25px;
+  font-size: 35px;
   font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
   text-align: center;
   color: rgb(255, 255, 255);
@@ -245,7 +257,7 @@ img{
   margin: 5px;
   transition: all 0.3s ease-in-out;
   background-color: #272727;
-  font-size: 25px;
+  font-size: 35px;
   font-family: "Nunito", "Arial Narrow", Arial, sans-serif;
   text-align: center;
   color: #00fa97;
@@ -275,7 +287,7 @@ input[type="search"] {
   font-size: 20px;
   border: none;
   border-radius: 5px;
-  height: 25px;
+  height: 35px;
 }
 
 #tbody_info,#tbody1_info,
@@ -451,3 +463,105 @@ input[type="date"] {
 .swal2-popup {
   position: inherit;
 }
+
+/* Cards Styles */
+.stats-container {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    width: 100%;
+    padding: 1rem;
+    overflow-x: auto;
+}
+
+.stats-card-wrapper {
+    flex: 1;
+    min-width: 200px;
+    max-width: 300px;
+}
+
+.stats-card {
+    background: var(--gray-100);
+    border-left: 4px solid var(--gray-500);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.stats-card .card-icon {
+    background-color: var(--gray-200);
+    color: var(--gray-600);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.stats-card .card-title {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.stats-card .card-value {
+    color: var(--gray-800);
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.stats-card .card-subtitle {
+    color: var(--gray-600);
+    font-size: 0.75rem;
+    text-align: center;
+    margin-bottom: 0.25rem;
+}
+
+/* Ajuste para telas menores */
+@media (max-width: 768px) {
+    .stats-container {
+        flex-wrap: wrap;
+    }
+    
+    .stats-card-wrapper {
+        flex: 0 0 calc(50% - 1rem);
+        min-width: 150px;
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-card-wrapper {
+        flex: 0 0 100%;
+    }
+}
+
+/* Metas Section Styles */
+.metas-card {
+    background: var(--gray-100);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.metas-card .input-group-text {
+    background-color: var(--gray-200);
+    color: var(--gray-700);
+    border: none;
+    font-weight: 500;
+}
+
+.metas-card .form-control {
+    border: 1px solid var(--gray-300);
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+}
+
+.metas-card .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(93, 92, 222, 0.25);
+}
+

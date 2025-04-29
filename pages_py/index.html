@@ -23,6 +23,16 @@
             --primary-color: #5D5CDE;
             --sidebar-bg: #1a1f36;
             --card-bg: #ffffff;
+            --purple: #9e8dff;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-400: #ced4da;
+            --gray-500: #adb5bd;
+            --gray-600: #6c757d;
+            --gray-700: #495057;
+            --gray-800: #343a40;
+            --gray-900: #212529;
         }
 
         /* Sidebar styles */
@@ -184,6 +194,10 @@
             color: #6c757d;
         }
 
+        .fs-7 {
+            font-size: 1.2rem;
+        }
+
         .swal2-toast {
             background: none !important;
             border: none !important;
@@ -242,6 +256,88 @@
             color: #333 !important;
             flex: 1 !important;
             overflow: visible !important;
+        }
+
+        /* New CSS for stats cards */
+        .stats-container {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 2px;
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gray-400) var(--gray-200);
+        }
+
+        .stats-card-wrapper {
+            flex-grow: 1;
+            min-width: 160px;
+        }
+
+        .stats-card {
+            background-color: var(--gray-100);
+            border: 1px solid var(--gray-300);
+            border-radius: 0.25rem;
+            padding: 0.75rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .stats-card:hover {
+            border-color: var(--gray-400);
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .card-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .card-subtitle {
+            color: var(--gray-600);
+        }
+
+        .card-icon {
+            font-size: 1.25rem;
+            color: var(--gray-600);
+            background-color: var(--gray-200);
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+        }
+
+        .desvio-badge {
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+
+        .desvio-badge-positivo {
+            background-color: #d1e7dd;
+            color: #155724;
+        }
+
+        .desvio-badge-negativo {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Scrollbar styles */
+        .stats-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .stats-container::-webkit-scrollbar-thumb {
+            background-color: var(--gray-400);
+            border-radius: 4px;
+        }
+
+        .stats-container::-webkit-scrollbar-track {
+            background-color: var(--gray-200);
         }
     </style>
 </head>
@@ -327,122 +423,163 @@
         <div class="row mb-4">
             <!-- Dashboard Content -->
             <div class="flex-1 overflow-y-auto p-6" style="background-color: #ffffff;">
+                <!-- Metas Section -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Metas</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">Meta PCA (%)</span>
+                                    <input type="number" id="meta_pca" class="form-control" value="0" min="0" max="100">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">Meta TMA (min)</span>
+                                    <input type="number" id="meta_tma" class="form-control" value="0" min="0">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">Meta Aderência (%)</span>
+                                    <input type="number" id="meta_aderencia" class="form-control" value="0" min="0"
+                                        max="100">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Stats Cards -->
-                <div class="row g-4">
+                <div class="stats-container">
                     <!-- Recebidas Card -->
-                    <div class="col-md-2">
-                        <div class="card border-start border-primary border-4 h-100">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h5 class="text-muted">RECEBIDAS</h5>
-                                    <div class="bg-primary bg-opacity-10 p-2 rounded">
-                                        <i class="fas fa-inbox text-primary"></i>
-                                    </div>
+                    <div class="stats-card-wrapper">
+                        <div class="stats-card">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <h6 class="card-title">RECEBIDAS</h6>
+                                <div class="card-icon">
+                                    <i class="fas fa-inbox"></i>
                                 </div>
-                                <h3 id="valor_recebidas" class="fs-2 fw-bold">0</h3>
-                                <div class="d-flex justify-content-center align-items-center fs-6">
-                                    <span>HD:</span>
-                                    <div id="total_consolidadoHD" class="ms-4">0</div>
-                                </div>
-                                <div class="d-flex justify-content-center align-items-center fs-6">
-                                    <span>SAC:</span>
-                                    <div id="total_consolidadoSAC" class="ms-4">0</div>
-                                </div>
-                                <div class="d-flex justify-content-center align-items-center fs-6">
-                                    <span>WEBBY:</span>
-                                    <div id="total_consolidadoWEBBY" class="ms-4">0</div>
-                                </div>
+                            </div>
+                            <h4 id="valor_recebidas" class="card-value">0</h4>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <span class="card-subtitle">HD:</span>
+                                <div id="total_consolidadoHD" class="card-subtitle ms-1">0</div>
+                            </div>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <span class="card-subtitle">SAC:</span>
+                                <div id="total_consolidadoSAC" class="card-subtitle ms-1">0</div>
+                            </div>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <span class="card-subtitle">WEBBY:</span>
+                                <div id="total_consolidadoWEBBY" class="card-subtitle ms-1">0</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Atendidas Card -->
-                    <div class="col-md-2">
-                        <div class="card border-start border-success border-4 h-100">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h5 class="text-muted">ATENDIDAS</h5>
-                                    <div class="bg-success bg-opacity-10 p-2 rounded">
-                                        <i class="fas fa-check-circle text-success"></i>
-                                    </div>
+                    <div class="stats-card-wrapper">
+                        <div class="stats-card">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <h6 class="card-title">ATENDIDAS</h6>
+                                <div class="card-icon">
+                                    <i class="fas fa-check-circle"></i>
                                 </div>
-                                <h3 id="valor_atendidas" class="fs-2 fw-bold">0</h3>
-                                <div id="atendidas_consolidadoHD" class="text-center">0</div>
-                                <div id="atendidas_consolidadoSAC" class="text-center">0</div>
-                                <div id="atendidas_consolidadoWEBBY" class="text-center">0</div>
                             </div>
+                            <h4 id="valor_atendidas" class="card-value">0</h4>
+                            <div id="atendidas_consolidadoHD" class="card-subtitle">0</div>
+                            <div id="atendidas_consolidadoSAC" class="card-subtitle">0</div>
+                            <div id="atendidas_consolidadoWEBBY" class="card-subtitle">0</div>
                         </div>
                     </div>
 
                     <!-- Abandonadas Card -->
-                    <div class="col-md-2">
-                        <div class="card border-start border-danger border-4 h-100">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h5 class="text-muted">ABAND.</h5>
-                                    <div class="bg-danger bg-opacity-10 p-2 rounded">
-                                        <i class="fas fa-times-circle text-danger"></i>
-                                    </div>
+                    <div class="stats-card-wrapper">
+                        <div class="stats-card">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <h6 class="card-title">ABAND.</h6>
+                                <div class="card-icon">
+                                    <i class="fas fa-times-circle"></i>
                                 </div>
-                                <h3 id="valor_aband" class="fs-2 fw-bold">0</h3>
-                                <div id="abandonadas_consolidadoHD" class="text-center">0</div>
-                                <div id="abandonadas_consolidadoSAC" class="text-center">0</div>
-                                <div id="abandonadas_consolidadoWEBBY" class="text-center">0</div>
                             </div>
+                            <h4 id="valor_aband" class="card-value">0</h4>
+                            <div id="abandonadas_consolidadoHD" class="card-subtitle">0</div>
+                            <div id="abandonadas_consolidadoSAC" class="card-subtitle">0</div>
+                            <div id="abandonadas_consolidadoWEBBY" class="card-subtitle">0</div>
                         </div>
                     </div>
 
                     <!-- PCA Card -->
-                    <div class="col-md-2">
-                        <div class="card border-start border-warning border-4 h-100">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h5 class="text-muted">PCA(%)</h5>
-                                    <div class="bg-warning bg-opacity-10 p-2 rounded">
-                                        <i class="fas fa-chart-pie text-warning"></i>
-                                    </div>
+                    <div class="stats-card-wrapper">
+                        <div class="stats-card">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <h6 class="card-title">PCA(%)</h6>
+                                <div class="card-icon">
+                                    <i class="fas fa-chart-pie"></i>
                                 </div>
-                                <h3 id="valor_pca" class="fs-2 fw-bold">0</h3>
-                                <div id="pca_consolidadoHD" class="text-center">0</div>
-                                <div id="pca_consolidadoSAC" class="text-center">0</div>
-                                <div id="pca_consolidadoWEBBY" class="text-center">0</div>
                             </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h4 id="valor_pca" class="card-value">0</h4>
+                                <div id="desvio_pca" class="desvio-badge">0%</div>
+                            </div>
+                            <div id="pca_consolidadoHD" class="card-subtitle">0</div>
+                            <div id="pca_consolidadoSAC" class="card-subtitle">0</div>
+                            <div id="pca_consolidadoWEBBY" class="card-subtitle">0</div>
                         </div>
                     </div>
 
                     <!-- TME Card -->
-                    <div class="col-md-2">
-                        <div class="card border-start border-info border-4 h-100">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h5 class="text-muted">TME</h5>
-                                    <div class="bg-info bg-opacity-10 p-2 rounded">
-                                        <i class="fas fa-clock text-info"></i>
-                                    </div>
+                    <div class="stats-card-wrapper">
+                        <div class="stats-card">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <h6 class="card-title">TME</h6>
+                                <div class="card-icon">
+                                    <i class="fas fa-clock"></i>
                                 </div>
-                                <h3 id="valor_tme" class="fs-2 fw-bold">00:00:00</h3>
-                                <div id="tme_consolidadoHD" class="text-center">00:00:00</div>
-                                <div id="tme_consolidadoSAC" class="text-center">00:00:00</div>
-                                <div id="tme_consolidadoWEBBY" class="text-center">00:00:00</div>
                             </div>
+                            <h4 id="valor_tme" class="card-value">00:00:00</h4>
+                            <div id="tme_consolidadoHD" class="card-subtitle">00:00:00</div>
+                            <div id="tme_consolidadoSAC" class="card-subtitle">00:00:00</div>
+                            <div id="tme_consolidadoWEBBY" class="card-subtitle">00:00:00</div>
                         </div>
                     </div>
 
                     <!-- TMA Card -->
-                    <div class="col-md-2">
-                        <div class="card border-start border-secondary border-4 h-100">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h5 class="text-muted">TMA</h5>
-                                    <div class="bg-secondary bg-opacity-10 p-2 rounded">
-                                        <i class="fas fa-hourglass-half text-secondary"></i>
-                                    </div>
+                    <div class="stats-card-wrapper">
+                        <div class="stats-card">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <h6 class="card-title">TMA</h6>
+                                <div class="card-icon">
+                                    <i class="fas fa-hourglass-half"></i>
                                 </div>
-                                <h3 id="valor_tma" class="fs-2 fw-bold">00:00:00</h3>
-                                <div id="tma_consolidadoHD" class="text-center">00:00:00</div>
-                                <div id="tma_consolidadoSAC" class="text-center">00:00:00</div>
-                                <div id="tma_consolidadoWEBBY" class="text-center">00:00:00</div>
                             </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h4 id="valor_tma" class="card-value">00:00:00</h4>
+                                <div id="desvio_tma" class="desvio-badge">0%</div>
+                            </div>
+                            <div id="tma_consolidadoHD" class="card-subtitle">00:00:00</div>
+                            <div id="tma_consolidadoSAC" class="card-subtitle">00:00:00</div>
+                            <div id="tma_consolidadoWEBBY" class="card-subtitle">00:00:00</div>
+                        </div>
+                    </div>
+
+                    <!-- Aderência Card -->
+                    <div class="stats-card-wrapper">
+                        <div class="stats-card">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <h6 class="card-title">ADERÊNCIA</h6>
+                                <div class="card-icon">
+                                    <i class="fas fa-user-clock"></i>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h4 id="valor_aderencia" class="card-value">0%</h4>
+                                <div id="desvio_aderencia" class="desvio-badge">0%</div>
+                            </div>
+                            <div id="aderencia_consolidadoHD" class="card-subtitle">0%</div>
+                            <div id="aderencia_consolidadoSAC" class="card-subtitle">0%</div>
+                            <div id="aderencia_consolidadoWEBBY" class="card-subtitle">0%</div>
                         </div>
                     </div>
                 </div>

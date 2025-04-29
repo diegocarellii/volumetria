@@ -197,7 +197,7 @@ async function fazPESQUISA_DEMANDA() {
 
     const xarray1 = assunto_webby;
     const yarray1 = contagem_webby;
-    
+
     // Atualiza o gráfico existente antes de desenhar o novo
     const renderElementG1 = document.getElementById("G1");
     const renderElementMyDiv1 = document.getElementById("myDiv1");
@@ -867,3 +867,110 @@ if (!localStorage.getItem("valor_pca")) {
   localStorage.setItem("valor_pca", "[]");
 
 }
+
+// Função para calcular o desvio percentual
+function calcularDesvio(valorAtual, meta) {
+  if (!meta || meta === 0) return null;
+  return ((valorAtual - meta) / meta) * 100;
+}
+
+// Função para atualizar o badge de desvio
+function atualizarDesvioBadge(elemento, desvio) {
+  // Verifica se o elemento existe antes de tentar acessá-lo
+  if (!elemento) {
+    console.warn('Elemento badge não encontrado');
+    return;
+  }
+
+  if (desvio === null) {
+    elemento.style.display = 'none';
+    return;
+  }
+
+  elemento.style.display = 'inline-block';
+  elemento.textContent = `${desvio >= 0 ? '+' : ''}${desvio.toFixed(1)}%`;
+
+  if (desvio >= 0) {
+    elemento.style.color = 'green';
+    elemento.style.backgroundColor = '#d1e7dd';
+    elemento.style.borderColor = '#198754';
+  } else {
+    elemento.style.color = '#721c24';
+    elemento.style.backgroundColor = '#f8d7da';
+    elemento.style.borderColor = '#f5c6cb';
+  }
+}
+
+// Função para atualizar todos os desvios
+function atualizarDesvios() {
+  // Verificar se os elementos de meta existem
+  const metaPCAElement = document.getElementById('meta_pca');
+  const metaTMAElement = document.getElementById('meta_tma');
+  const metaAderenciaElement = document.getElementById('meta_aderencia');
+
+  // Verificar se os elementos de valor existem
+  const valorPCAElement = document.getElementById('valor_pca');
+  const valorTMAElement = document.getElementById('valor_tma');
+  const valorAderenciaElement = document.getElementById('valor_aderencia');
+
+  // Verificar se os elementos de badge existem
+  const pcaBadge = document.querySelector('.stats-card:nth-child(1) .desvio-badge');
+  const tmaBadge = document.querySelector('.stats-card:nth-child(2) .desvio-badge');
+  const aderenciaBadge = document.querySelector('.stats-card:nth-child(3) .desvio-badge');
+
+  // Obter valores com verificação de segurança
+  const metaPCA = metaPCAElement ? parseFloat(metaPCAElement.value) || 0 : 0;
+  const metaTMA = metaTMAElement ? parseFloat(metaTMAElement.value) || 0 : 0;
+  const metaAderencia = metaAderenciaElement ? parseFloat(metaAderenciaElement.value) || 0 : 0;
+
+  const valorPCA = valorPCAElement ? parseFloat(valorPCAElement.textContent) || 0 : 0;
+  const valorTMA = valorTMAElement ? parseFloat(valorTMAElement.textContent) || 0 : 0;
+  const valorAderencia = valorAderenciaElement ? parseFloat(valorAderenciaElement.textContent) || 0 : 0;
+
+  // Calcular e atualizar desvios apenas se os badges existirem
+  if (pcaBadge) {
+    const desvioPCA = calcularDesvio(valorPCA, metaPCA);
+    atualizarDesvioBadge(pcaBadge, desvioPCA);
+  }
+
+  if (tmaBadge) {
+    const desvioTMA = calcularDesvio(valorTMA, metaTMA);
+    atualizarDesvioBadge(tmaBadge, desvioTMA);
+  }
+
+  if (aderenciaBadge) {
+    const desvioAderencia = calcularDesvio(valorAderencia, metaAderencia);
+    atualizarDesvioBadge(aderenciaBadge, desvioAderencia);
+  }
+}
+
+// Adicionar event listeners para os campos de meta
+document.addEventListener('DOMContentLoaded', () => {
+  const metaPCAElement = document.getElementById('meta_pca');
+  const metaTMAElement = document.getElementById('meta_tma');
+  const metaAderenciaElement = document.getElementById('meta_aderencia');
+
+  if (metaPCAElement) {
+    metaPCAElement.addEventListener('input', atualizarDesvios);
+  }
+  if (metaTMAElement) {
+    metaTMAElement.addEventListener('input', atualizarDesvios);
+  }
+  if (metaAderenciaElement) {
+    metaAderenciaElement.addEventListener('input', atualizarDesvios);
+  }
+
+  // Configurar o observer apenas se os elementos existirem
+  const elementos = ['valor_pca', 'valor_tma', 'valor_aderencia'].map(id => document.getElementById(id));
+  elementos.forEach(element => {
+    if (element) {
+      observer.observe(element, observerConfig);
+    }
+  });
+
+  // Primeira atualização quando a página carregar
+  atualizarDesvios();
+});
+
+// Manter a atualização periódica
+setInterval(atualizarDesvios, 60000);
