@@ -494,6 +494,33 @@ async function fazGET_GRAFICO() {
 }
 
 //===============================================================================
+async function abs() {
+  const response = await fetch(`/abs`);
+  const data = await response.json();
+  const abs_natal = document.getElementById("abs_natal");
+  abs_natal.innerHTML = data['abs'][0] + '%';
+
+  const abs_fort = document.getElementById("abs_fort");
+  abs_fort.innerHTML = data['abs'][2] + '%';
+
+  const abs_ourinhos = document.getElementById("abs_ourinhos");
+  abs_ourinhos.innerHTML = data['abs'][1] + '%';
+
+  const valor_abs = document.getElementById("valor_abs");
+  const media_abs = (data['abs'][0] + data['abs'][2] + data['abs'][1]) / 3
+  valor_abs.innerHTML = media_abs.toFixed(1) + '%';
+}
+
+function fazGET_abs() {
+  abs();
+}
+
+setInterval(() => {
+  fazGET_abs();
+}, 60000);
+
+//===============================================================================
+
 async function escalados_logados() {
 
   const response = await fetch("/logados");
@@ -906,28 +933,28 @@ function atualizarDesvios() {
   // Verificar se os elementos de meta existem
   const metaPCAElement = document.getElementById('meta_pca');
   const metaTMAElement = document.getElementById('meta_tma');
-  const metaAderenciaElement = document.getElementById('meta_aderencia');
+  const metaabsElement = document.getElementById('meta_abs');
 
   // Verificar se os elementos de valor existem
   const valorPCAElement = document.getElementById('valor_pca');
   const valorTMAElement = document.getElementById('valor_tma');
-  const valorAderenciaElement = document.getElementById('valor_aderencia');
+  const valorabsElement = document.getElementById('valor_abs');
 
-  // Verificar se os elementos de badge existem
-  const pcaBadge = document.querySelector('.stats-card:nth-child(1) .desvio-badge');
-  const tmaBadge = document.querySelector('.stats-card:nth-child(2) .desvio-badge');
-  const aderenciaBadge = document.querySelector('.stats-card:nth-child(3) .desvio-badge');
+  // Modificar a forma de selecionar os badges
+  const pcaBadge = document.getElementById('desvio-badge-pca');
+  const tmaBadge = document.getElementById('desvio-badge-tma');
+  const absBadge = document.getElementById('desvio-badge-abs');
 
   // Obter valores com verificação de segurança
   const metaPCA = metaPCAElement ? parseFloat(metaPCAElement.value) || 0 : 0;
   const metaTMA = metaTMAElement ? parseFloat(metaTMAElement.value) || 0 : 0;
-  const metaAderencia = metaAderenciaElement ? parseFloat(metaAderenciaElement.value) || 0 : 0;
+  const metaabs = metaabsElement ? parseFloat(metaabsElement.value) || 0 : 0;
 
   const valorPCA = valorPCAElement ? parseFloat(valorPCAElement.textContent) || 0 : 0;
   const valorTMA = valorTMAElement ? parseFloat(valorTMAElement.textContent) || 0 : 0;
-  const valorAderencia = valorAderenciaElement ? parseFloat(valorAderenciaElement.textContent) || 0 : 0;
+  const valorabs = valorabsElement ? parseFloat(valorabsElement.textContent) || 0 : 0;
 
-  // Calcular e atualizar desvios apenas se os badges existirem
+  // Calcular e atualizar desvios
   if (pcaBadge) {
     const desvioPCA = calcularDesvio(valorPCA, metaPCA);
     atualizarDesvioBadge(pcaBadge, desvioPCA);
@@ -938,9 +965,9 @@ function atualizarDesvios() {
     atualizarDesvioBadge(tmaBadge, desvioTMA);
   }
 
-  if (aderenciaBadge) {
-    const desvioAderencia = calcularDesvio(valorAderencia, metaAderencia);
-    atualizarDesvioBadge(aderenciaBadge, desvioAderencia);
+  if (absBadge) {
+    const desvioabs = calcularDesvio(valorabs, metaabs);
+    atualizarDesvioBadge(absBadge, desvioabs);
   }
 }
 
@@ -948,7 +975,7 @@ function atualizarDesvios() {
 document.addEventListener('DOMContentLoaded', () => {
   const metaPCAElement = document.getElementById('meta_pca');
   const metaTMAElement = document.getElementById('meta_tma');
-  const metaAderenciaElement = document.getElementById('meta_aderencia');
+  const metaabsElement = document.getElementById('meta_abs');
 
   if (metaPCAElement) {
     metaPCAElement.addEventListener('input', atualizarDesvios);
@@ -956,12 +983,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (metaTMAElement) {
     metaTMAElement.addEventListener('input', atualizarDesvios);
   }
-  if (metaAderenciaElement) {
-    metaAderenciaElement.addEventListener('input', atualizarDesvios);
+  if (metaabsElement) {
+    metaabsElement.addEventListener('input', atualizarDesvios);
   }
 
   // Configurar o observer apenas se os elementos existirem
-  const elementos = ['valor_pca', 'valor_tma', 'valor_aderencia'].map(id => document.getElementById(id));
+  const elementos = ['valor_pca', 'valor_tma', 'valor_abs'].map(id => document.getElementById(id));
   elementos.forEach(element => {
     if (element) {
       observer.observe(element, observerConfig);

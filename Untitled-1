@@ -1,0 +1,32 @@
+SELECT
+    e.cidade,
+    e.Escalados,
+    l.Logados
+FROM
+    (SELECT  
+        ec.cidade,
+        COUNT(*) as Escalados
+    FROM
+        callcenter_negocios.escala_callcenter as ec
+    LEFT JOIN
+        callcenter_logon_mod0005 as cl 
+    ON
+        ec.evolux = cl.agent_login AND cl.time_login::date = CURRENT_DATE 
+    WHERE
+        ec.data::date = date_trunc('month', CURRENT_DATE) AND ec.valido = '1' 
+    GROUP BY ec.cidade) e
+LEFT JOIN
+    (SELECT  
+        ec.cidade,
+        COUNT(*) as Logados
+    FROM
+        callcenter_negocios.escala_callcenter as ec
+    LEFT JOIN
+        callcenter_logon_mod0005 as cl 
+    ON
+        ec.evolux = cl.agent_login AND cl.time_login::date = CURRENT_DATE 
+    WHERE
+        ec.data::date = date_trunc('month', CURRENT_DATE) AND ec.valido = '1' AND cl.time_login IS NOT NULL 
+    GROUP BY ec.cidade) l
+ON e.cidade = l.cidade
+ORDER BY e.Escalados DESC 

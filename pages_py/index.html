@@ -442,9 +442,8 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="input-group mb-3">
-                                    <span class="input-group-text">Meta Aderência (%)</span>
-                                    <input type="number" id="meta_aderencia" class="form-control" value="0" min="0"
-                                        max="100">
+                                    <span class="input-group-text">Meta ABS (%)</span>
+                                    <input type="number" id="meta_abs" class="form-control" value="0" min="0" max="100">
                                 </div>
                             </div>
                         </div>
@@ -521,7 +520,7 @@
                             </div>
                             <div class="d-flex justify-content-between align-items-center">
                                 <h4 id="valor_pca" class="card-value">0</h4>
-                                <div id="desvio_pca" class="desvio-badge">0%</div>
+                                <div id="desvio-badge-pca" class="desvio-badge">0%</div>
                             </div>
                             <div id="pca_consolidadoHD" class="card-subtitle">0</div>
                             <div id="pca_consolidadoSAC" class="card-subtitle">0</div>
@@ -556,7 +555,7 @@
                             </div>
                             <div class="d-flex justify-content-between align-items-center">
                                 <h4 id="valor_tma" class="card-value">00:00:00</h4>
-                                <div id="desvio_tma" class="desvio-badge">0%</div>
+                                <div id="desvio-badge-tma" class="desvio-badge">0%</div>
                             </div>
                             <div id="tma_consolidadoHD" class="card-subtitle">00:00:00</div>
                             <div id="tma_consolidadoSAC" class="card-subtitle">00:00:00</div>
@@ -564,22 +563,32 @@
                         </div>
                     </div>
 
-                    <!-- Aderência Card -->
+                    <!-- ABS Card -->
                     <div class="stats-card-wrapper">
                         <div class="stats-card">
                             <div class="d-flex justify-content-between align-items-start mb-1">
-                                <h6 class="card-title">ADERÊNCIA</h6>
+                                <h6 class="card-title">ABS</h6>
                                 <div class="card-icon">
                                     <i class="fas fa-user-clock"></i>
                                 </div>
                             </div>
                             <div class="d-flex justify-content-between align-items-center">
-                                <h4 id="valor_aderencia" class="card-value">0%</h4>
-                                <div id="desvio_aderencia" class="desvio-badge">0%</div>
+                                <h4 id="valor_abs" class="card-value">0%</h4>
+                                <div id="desvio-badge-abs"" class=" desvio-badge">0%</div>
                             </div>
-                            <div id="aderencia_consolidadoHD" class="card-subtitle">0%</div>
-                            <div id="aderencia_consolidadoSAC" class="card-subtitle">0%</div>
-                            <div id="aderencia_consolidadoWEBBY" class="card-subtitle">0%</div>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <span class="card-subtitle">NATAL: </span>
+                                <div id="abs_natal" class="card-subtitle"> 0%</div>
+                            </div>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <span class="card-subtitle">FORT: </span>
+                                <div id="abs_fort" class="card-subtitle"> 0%</div>
+                            </div>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <span class="card-subtitle">OURINHOS:</span>
+                                <div id="abs_ourinhos" class="card-subtitle"> 0%</div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -746,9 +755,12 @@
             document.querySelector('.main-content').classList.toggle('main-content-expanded');
         });
 
-        // Your existing JavaScript code here
     </script>
     <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fazGET_abs();
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             fazGET_GRAFICO();

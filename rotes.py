@@ -1321,3 +1321,53 @@ def download_html_contrato():
                 return jsonify({"error": "Nenhum contrato encontrado."}), 400  # Retorna erro se não houver contratos
                 
     return jsonify({"error": "Método não permitido."}), 405  # Retorna erro se não for POST
+
+
+@app.route('/abs', methods=['GET'])
+def abs():
+    conn = connect_db("SADIG_DB")
+    cursor = conn.cursor()
+    query = """SELECT
+                e.cidade,
+                e.Escalados,
+                l.Logados
+                
+            FROM
+                (SELECT  
+                    ec.cidade,
+                    COUNT(*) as Escalados
+                FROM
+                    callcenter_negocios.escala_callcenter as ec
+                LEFT JOIN
+                    callcenter_logon_mod0005 as cl 
+                ON
+                    ec.evolux = cl.agent_login AND cl.time_login::date = CURRENT_DATE 
+                WHERE
+                    ec.data::date = date_trunc('month', CURRENT_DATE) AND ec.valido = '1' 
+                GROUP BY ec.cidade) e
+            LEFT JOIN
+                (SELECT  
+                    ec.cidade,
+                    COUNT(*) as Logados
+                FROM
+                    callcenter_negocios.escala_callcenter as ec
+                LEFT JOIN
+                    callcenter_logon_mod0005 as cl 
+                ON
+                    ec.evolux = cl.agent_login AND cl.time_login::date = CURRENT_DATE 
+                WHERE
+                    ec.data::date = date_trunc('month', CURRENT_DATE) AND ec.valido = '1' AND cl.time_login IS NOT NULL 
+                GROUP BY ec.cidade) l
+            ON e.cidade = l.cidade
+            ORDER BY e.Escalados DESC"""
+    cursor.execute(query)
+    rows1 = cursor.fetchall()
+    cursor.close()
+    df2 = pd.DataFrame(rows1, columns=['cidade', 'escalados', 'logados'])
+    df2 = df2.dropna()
+    
+    total = df2['escalados'].sum()
+
+    df2['abs'] = round((df2['logados'] / total) * 100)
+    df = df2.to_json(orient='columns')
+    return df
