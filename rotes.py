@@ -1364,8 +1364,10 @@ def abs():
     rows1 = cursor.fetchall()
     cursor.close()
     df2 = pd.DataFrame(rows1, columns=['cidade', 'escalados', 'logados'])
+    df2['logados'] = df2['logados'].fillna(0)
+
     df2 = df2.dropna()
-    
+
     total = df2['escalados'].sum()
 
     df2['abs'] = round((df2['logados'] / total) * 100)
