@@ -4,39 +4,99 @@ let percentages = [];
 let ajustes = {};
 
 function updateChart() {
-    const originalData = percentages;
-    const adjustedData = categories.map((categoria, index) => {
-        const originalPercent = percentages[index];
-        const ajuste = ajustes[categoria];
-        const adjustedValue = ajuste !== undefined ? originalPercent * parseFloat(ajuste) : originalPercent;
-        return Number(adjustedValue.toFixed(2));
+    const totalVolumeInput = parseFloat(document.getElementById('totalVolume').value); // Valor total do input
+    if (isNaN(totalVolumeInput)) {
+        alert('Por favor, insira um valor total válido.');
+        return;
+    }
+
+    // Função para converter "1 - dom" em uma data no formato dd/mm/aaaa
+    function convertToDate(categoria) {
+        const [weekNumber, dayOfWeek] = categoria.split(' - ');
+        const daysOfWeekMap = {
+            dom: 0, seg: 1, ter: 2, qua: 3, qui: 4, sex: 5, sáb: 6
+        };
+
+        const referenceMonth = 0; // Janeiro (0 = Janeiro, 1 = Fevereiro, etc.)
+        const referenceYear = 2025; // Ano de referência
+        const firstDayOfMonth = new Date(referenceYear, referenceMonth, 1);
+        const dayOffset = daysOfWeekMap[dayOfWeek.toLowerCase()];
+        const firstTargetDay = new Date(firstDayOfMonth);
+
+        // Encontrar o primeiro dia da semana correspondente no mês
+        while (firstTargetDay.getDay() !== dayOffset) {
+            firstTargetDay.setDate(firstTargetDay.getDate() + 1);
+        }
+
+        // Adicionar semanas para chegar à semana desejada
+        const targetDate = new Date(firstTargetDay);
+        targetDate.setDate(targetDate.getDate() + (parseInt(weekNumber) - 1) * 7);
+
+        // Retornar a data formatada como dd/mm/aaaa
+        return targetDate.toLocaleDateString('pt-BR');
+    }
+
+    // Mapear categorias para volumes
+    const categoryVolumes = categories.map((categoria, index) => {
+        const percentage = percentages[index];
+        const volume = (percentage / 100) * totalVolumeInput; // Calcular volume baseado na % Curva
+        return { categoria, volume };
     });
 
+    // Gerar as datas de maio de 2025
+    const may2025Dates = [];
+    const may2025Start = new Date(2025, 4, 1); // Maio de 2025 (mês 4 porque é zero-based)
+    const may2025End = new Date(2025, 4, 31);
+
+    for (let d = new Date(may2025Start); d <= may2025End; d.setDate(d.getDate() + 1)) {
+        may2025Dates.push({
+            date: d.toLocaleDateString('pt-BR'),
+            dayOfWeek: d.getDay(), // Índice do dia da semana (0 = domingo, 1 = segunda, etc.)
+            volume: 0 // Inicialmente sem volume
+        });
+    }
+
+    // Associar volumes às datas de maio de 2025
+    may2025Dates.forEach(dateObj => {
+        const matchingCategory = categoryVolumes.find(catVol => {
+            const [weekNumber, dayOfWeek] = catVol.categoria.split(' - ');
+            const daysOfWeekMap = {
+                dom: 0, seg: 1, ter: 2, qua: 3, qui: 4, sex: 5, sáb: 6
+            };
+            return daysOfWeekMap[dayOfWeek.toLowerCase()] === dateObj.dayOfWeek;
+        });
+
+        if (matchingCategory) {
+            dateObj.volume = matchingCategory.volume; // Atribuir o volume correspondente
+        }
+    });
+
+    // Logar as datas e os volumes
+    console.log("Datas e Volumes:");
+    may2025Dates.forEach(item => {
+        console.log(`Data: ${item.date}, Volume: ${item.volume.toFixed(2)}`);
+    });
+
+    // Preparar os dados para o gráfico
+    const labels = may2025Dates.map(item => item.date); // Datas no eixo X
+    const data = may2025Dates.map(item => item.volume); // Volumes no eixo Y
+
     if (chartInstance) {
-        chartInstance.data.datasets[0].data = originalData;
-        chartInstance.data.datasets[1].data = adjustedData;
+        chartInstance.data.labels = labels; // Atualize os rótulos do eixo X
+        chartInstance.data.datasets[0].data = data; // Atualize os volumes
         chartInstance.update();
     } else {
         const ctx = document.getElementById('percentChart').getContext('2d');
         chartInstance = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: categories,
+                labels: labels, // Use as datas como rótulos
                 datasets: [
                     {
-                        label: '% Curva Original',
-                        data: originalData,
+                        label: 'Volume Total Baseado na % Curva',
+                        data: data, // Use os volumes calculados
                         backgroundColor: 'rgba(54, 162, 235, 0.6)',
                         borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 2,
-                        fill: false,
-                        tension: 0.4
-                    },
-                    {
-                        label: '% Curva Ajustada',
-                        data: adjustedData,
-                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
                         borderWidth: 2,
                         fill: false,
                         tension: 0.4
@@ -49,14 +109,20 @@ function updateChart() {
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Percentual (%)'
+                            text: 'Volume Total'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Datas'
                         }
                     }
                 },
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Curva Proporcional por Categoria'
+                        text: 'Volume Total por Data'
                     }
                 }
             }

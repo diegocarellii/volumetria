@@ -224,6 +224,11 @@
                     <label for="excelFile" class="form-label">Carregar Arquivo Excel:</label>
                     <input type="file" class="form-control" id="excelFile" accept=".xlsx, .xls">
                 </div>
+                <!-- Inputs para selecionar o mês e o ano -->
+<label class="form-label" for="monthInput">Mês:</label>
+<input class="form-control" type="number" id="monthInput" min="1" max="12" placeholder="Mês (1-12)">
+<label class="form-label" for="yearInput">Ano:</label>
+<input class="form-control" type="number" id="yearInput" min="1900" max="2100" placeholder="Ano (ex: 2025)">
                 <button class="btn btn-primary" onclick="processData()">Processar Dados</button>
             </div>
 
@@ -279,6 +284,118 @@
         </div>
     </div>
 
+    <script>
+        function updateChart() {
+            const totalVolumeInput = parseFloat(document.getElementById('totalVolume').value); // Valor total do input
+            if (isNaN(totalVolumeInput)) {
+                alert('Por favor, insira um valor total válido.');
+                return;
+            }
+
+            // Obter o mês e o ano dos inputs
+            const monthInput = parseInt(document.getElementById('monthInput').value); // Mês selecionado (1-12)
+            const yearInput = parseInt(document.getElementById('yearInput').value); // Ano selecionado
+
+            if (isNaN(monthInput) || isNaN(yearInput) || monthInput < 1 || monthInput > 12 || yearInput < 1900 || yearInput > 2100) {
+                alert('Por favor, insira um mês (1-12) e ano válidos.');
+                return;
+            }
+
+            // Mapear categorias para volumes
+            const categoryVolumes = categories.map((categoria, index) => {
+                const percentage = percentages[index];
+                const volume = (percentage / 100) * totalVolumeInput; // Calcular volume baseado na % Curva
+                return { categoria, volume };
+            });
+
+            // Gerar as datas do mês selecionado
+            const selectedMonthDates = [];
+            const selectedMonthStart = new Date(yearInput, monthInput - 1, 1); // Mês selecionado (zero-based)
+            const selectedMonthEnd = new Date(yearInput, monthInput, 0); // Último dia do mês selecionado
+
+            for (let d = new Date(selectedMonthStart); d <= selectedMonthEnd; d.setDate(d.getDate() + 1)) {
+                selectedMonthDates.push({
+                    date: d.toLocaleDateString('pt-BR'),
+                    dayOfWeek: d.getDay(), // Índice do dia da semana (0 = domingo, 1 = segunda, etc.)
+                    volume: 0 // Inicialmente sem volume
+                });
+            }
+
+            // Associar volumes às datas do mês selecionado
+            selectedMonthDates.forEach(dateObj => {
+                const matchingCategory = categoryVolumes.find(catVol => {
+                    const [weekNumber, dayOfWeek] = catVol.categoria.split(' - ');
+                    const daysOfWeekMap = {
+                        dom: 0, seg: 1, ter: 2, qua: 3, qui: 4, sex: 5, sáb: 6
+                    };
+                    return daysOfWeekMap[dayOfWeek.toLowerCase()] === dateObj.dayOfWeek;
+                });
+
+                if (matchingCategory) {
+                    dateObj.volume = matchingCategory.volume; // Atribuir o volume correspondente
+                }
+            });
+
+            // Logar as datas e os volumes
+            console.log("Datas e Volumes:");
+            selectedMonthDates.forEach(item => {
+                console.log(`Data: ${item.date}, Volume: ${item.volume.toFixed(2)}`);
+            });
+
+            // Preparar os dados para o gráfico
+            const labels = selectedMonthDates.map(item => item.date); // Datas no eixo X
+            const data = selectedMonthDates.map(item => item.volume); // Volumes no eixo Y
+
+            if (chartInstance) {
+                chartInstance.data.labels = labels; // Atualize os rótulos do eixo X
+                chartInstance.data.datasets[0].data = data; // Atualize os volumes
+                chartInstance.update();
+            } else {
+                const ctx = document.getElementById('percentChart').getContext('2d');
+                chartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels, // Use as datas como rótulos
+                        datasets: [
+                            {
+                                label: 'Volume Total Baseado na % Curva',
+                                data: data, // Use os volumes calculados
+                                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 2,
+                                fill: false,
+                                tension: 0.4
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Volume Total'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Datas'
+                                }
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Volume Total por Data'
+                            }
+                        }
+                    }
+                });
+                document.getElementById('percentChart').style.display = 'block';
+            }
+        }
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
