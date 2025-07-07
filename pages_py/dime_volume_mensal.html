@@ -8,9 +8,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
-    <script src="{{url_for('static', filename='js/dime_volume_mensal.js')}}"></script>
-
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
@@ -135,6 +132,27 @@
         z-index: 1001;
         display: none;
     }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+    }
+    .table th, .table td {
+        border: 1px solid #dee2e6;
+        padding: 8px;
+        text-align: center;
+    }
+    .table thead {
+        background: #343a40;
+        color: #fff;
+    }
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #f2f2f2;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #e9ecef;
+    }
 </style>
 
 <body>
@@ -216,6 +234,16 @@
         <div class="container">
             <h2 class="mb-4">Processamento de Volume por Categoria</h2>
             <div class="card p-4 mb-4">
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="limiteSuperiorInput" class="form-label">Multiplicador Limite Superior:</label>
+                        <input type="number" class="form-control" id="limiteSuperiorInput" value="1.5" step="0.1" min="0">
+                    </div>
+                    <div class="col">
+                        <label for="limiteInferiorInput" class="form-label">Multiplicador Limite Inferior:</label>
+                        <input type="number" class="form-control" id="limiteInferiorInput" value="1.5" step="0.1" min="0">
+                    </div>
+                </div>
                 <div class="mb-3">
                     <label for="totalVolume" class="form-label">Volume Total do Mês:</label>
                     <input type="number" class="form-control" id="totalVolume" placeholder="Digite o volume total">
@@ -224,13 +252,14 @@
                     <label for="excelFile" class="form-label">Carregar Arquivo Excel:</label>
                     <input type="file" class="form-control" id="excelFile" accept=".xlsx, .xls">
                 </div>
-                <!-- Inputs para selecionar o mês e o ano -->
-<label class="form-label" for="monthInput">Mês:</label>
-<input class="form-control" type="number" id="monthInput" min="1" max="12" placeholder="Mês (1-12)">
-<label class="form-label" for="yearInput">Ano:</label>
-<input class="form-control" type="number" id="yearInput" min="1900" max="2100" placeholder="Ano (ex: 2025)">
+                <div class="mb-3">
+                    <label for="outlierFile" class="form-label">Carregar Arquivo Excel para Outlier:</label>
+                    <input type="file" class="form-control" id="outlierFile" accept=".xlsx, .xls">
+                </div>
                 <button class="btn btn-primary" onclick="processData()">Processar Dados</button>
+                <button class="btn btn-secondary" onclick="processOutlier()">Analisar Outlier</button>
             </div>
+
 
             <div class="row month-card" id="monthCards" style="display: none;">
                 <div class="col-md-4">
@@ -258,15 +287,42 @@
                     </div>
                 </div>
             </div>
+            <div class="container mt-4">
+                <!-- Gráfico de Percentual -->
+                <div style="width: 100%; max-width: 900px; margin: 0 auto;">
+                    <canvas id="percentChart" height="120"></canvas>
+                </div>
 
-            <div class="chart-container">
-                <canvas id="percentChart" style="display: none;"></canvas>
+                <!-- Tabela de Feriados -->
+                <div class="my-4">
+                    <h4 class="text-center mb-3">Feriados Nacionais 2025</h4>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover shadow" style="background: #fff;">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Dia da Semana</th>
+                                    <th>Feriado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaFeriados">
+                                <!-- Feriados inseridos via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Outlier -->
+                <div style="width: 100%; max-width: 900px; margin: 0 auto;">
+                    <canvas id="outlierChart" height="120" style="display:none"></canvas>
+                </div>
             </div>
 
             <div class="table-container">
                 <table id="resultTable" class="table table-striped table-bordered" style="display: none;">
                     <thead class="table-light">
                         <tr>
+                            <th>DMM</th>
                             <th>Categoria</th>
                             <th id="month1">Mês 1</th>
                             <th id="month2">Mês 2</th>
@@ -284,122 +340,123 @@
         </div>
     </div>
 
-    <script>
-        function updateChart() {
-            const totalVolumeInput = parseFloat(document.getElementById('totalVolume').value); // Valor total do input
-            if (isNaN(totalVolumeInput)) {
-                alert('Por favor, insira um valor total válido.');
-                return;
-            }
+ <!-- Lista dos feriados nacionais de 2025 -->
+ <script>
+    // Função para obter o ano atual
+    function anoAtual() {
+        return new Date().getFullYear();
+    }
 
-            // Obter o mês e o ano dos inputs
-            const monthInput = parseInt(document.getElementById('monthInput').value); // Mês selecionado (1-12)
-            const yearInput = parseInt(document.getElementById('yearInput').value); // Ano selecionado
+    // Feriados fixos (mesmo dia/mês todo ano)
+    function feriadosFixos(ano) {
+        return [
+            { data: `01/01/${ano}`, nome: 'Confraternização Universal' },
+            { data: `21/04/${ano}`, nome: 'Tiradentes' },
+            { data: `01/05/${ano}`, nome: 'Dia do Trabalho' },
+            { data: `07/09/${ano}`, nome: 'Independência do Brasil' },
+            { data: `12/10/${ano}`, nome: 'Nossa Senhora Aparecida' },
+            { data: `02/11/${ano}`, nome: 'Finados' },
+            { data: `15/11/${ano}`, nome: 'Proclamação da República' },
+            { data: `25/12/${ano}`, nome: 'Natal' }
+        ];
+    }
 
-            if (isNaN(monthInput) || isNaN(yearInput) || monthInput < 1 || monthInput > 12 || yearInput < 1900 || yearInput > 2100) {
-                alert('Por favor, insira um mês (1-12) e ano válidos.');
-                return;
-            }
+    // Cálculo da Páscoa (algoritmo de Meeus/Jones/Butcher)
+    function calcularPascoa(ano) {
+        var a = ano % 19;
+        var b = Math.floor(ano / 100);
+        var c = ano % 100;
+        var d = Math.floor(b / 4);
+        var e = b % 4;
+        var f = Math.floor((b + 8) / 25);
+        var g = Math.floor((b - f + 1) / 3);
+        var h = (19 * a + b - d - g + 15) % 30;
+        var i = Math.floor(c / 4);
+        var k = c % 4;
+        var l = (32 + 2 * e + 2 * i - h - k) % 7;
+        var m = Math.floor((a + 11 * h + 22 * l) / 451);
+        var mes = Math.floor((h + l - 7 * m + 114) / 31);
+        var dia = ((h + l - 7 * m + 114) % 31) + 1;
+        return new Date(ano, mes - 1, dia);
+    }
 
-            // Mapear categorias para volumes
-            const categoryVolumes = categories.map((categoria, index) => {
-                const percentage = percentages[index];
-                const volume = (percentage / 100) * totalVolumeInput; // Calcular volume baseado na % Curva
-                return { categoria, volume };
-            });
+    // Feriados móveis
+    function feriadosMoveis(ano) {
+        const pascoa = calcularPascoa(ano);
 
-            // Gerar as datas do mês selecionado
-            const selectedMonthDates = [];
-            const selectedMonthStart = new Date(yearInput, monthInput - 1, 1); // Mês selecionado (zero-based)
-            const selectedMonthEnd = new Date(yearInput, monthInput, 0); // Último dia do mês selecionado
+        // Carnaval: 47 dias antes da Páscoa
+        const carnaval1 = new Date(pascoa);
+        carnaval1.setDate(pascoa.getDate() - 47);
 
-            for (let d = new Date(selectedMonthStart); d <= selectedMonthEnd; d.setDate(d.getDate() + 1)) {
-                selectedMonthDates.push({
-                    date: d.toLocaleDateString('pt-BR'),
-                    dayOfWeek: d.getDay(), // Índice do dia da semana (0 = domingo, 1 = segunda, etc.)
-                    volume: 0 // Inicialmente sem volume
-                });
-            }
+        const carnaval2 = new Date(pascoa);
+        carnaval2.setDate(pascoa.getDate() - 46);
 
-            // Associar volumes às datas do mês selecionado
-            selectedMonthDates.forEach(dateObj => {
-                const matchingCategory = categoryVolumes.find(catVol => {
-                    const [weekNumber, dayOfWeek] = catVol.categoria.split(' - ');
-                    const daysOfWeekMap = {
-                        dom: 0, seg: 1, ter: 2, qua: 3, qui: 4, sex: 5, sáb: 6
-                    };
-                    return daysOfWeekMap[dayOfWeek.toLowerCase()] === dateObj.dayOfWeek;
-                });
+        // Sexta-feira Santa: 2 dias antes da Páscoa
+        const sextaSanta = new Date(pascoa);
+        sextaSanta.setDate(pascoa.getDate() - 2);
 
-                if (matchingCategory) {
-                    dateObj.volume = matchingCategory.volume; // Atribuir o volume correspondente
-                }
-            });
+        // Corpus Christi: 60 dias após a Páscoa
+        const corpusChristi = new Date(pascoa);
+        corpusChristi.setDate(pascoa.getDate() + 60);
 
-            // Logar as datas e os volumes
-            console.log("Datas e Volumes:");
-            selectedMonthDates.forEach(item => {
-                console.log(`Data: ${item.date}, Volume: ${item.volume.toFixed(2)}`);
-            });
-
-            // Preparar os dados para o gráfico
-            const labels = selectedMonthDates.map(item => item.date); // Datas no eixo X
-            const data = selectedMonthDates.map(item => item.volume); // Volumes no eixo Y
-
-            if (chartInstance) {
-                chartInstance.data.labels = labels; // Atualize os rótulos do eixo X
-                chartInstance.data.datasets[0].data = data; // Atualize os volumes
-                chartInstance.update();
-            } else {
-                const ctx = document.getElementById('percentChart').getContext('2d');
-                chartInstance = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels, // Use as datas como rótulos
-                        datasets: [
-                            {
-                                label: 'Volume Total Baseado na % Curva',
-                                data: data, // Use os volumes calculados
-                                backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                borderWidth: 2,
-                                fill: false,
-                                tension: 0.4
-                            }
-                        ]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Volume Total'
-                                }
-                            },
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Datas'
-                                }
-                            }
-                        },
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: 'Volume Total por Data'
-                            }
-                        }
-                    }
-                });
-                document.getElementById('percentChart').style.display = 'block';
-            }
+        // Helper para formatar data
+        function formatarData(data) {
+            const dia = String(data.getDate()).padStart(2, '0');
+            const mes = String(data.getMonth() + 1).padStart(2, '0');
+            const ano = data.getFullYear();
+            return `${dia}/${mes}/${ano}`;
         }
+
+        return [
+            { data: formatarData(carnaval1), nome: 'Carnaval' },
+            { data: formatarData(carnaval2), nome: 'Carnaval' },
+            { data: formatarData(sextaSanta), nome: 'Sexta-feira Santa' },
+            { data: formatarData(corpusChristi), nome: 'Corpus Christi' }
+        ];
+    }
+
+    function diaSemana(dataStr) {
+        const partes = dataStr.split('/');
+        const data = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
+        const dias = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+        return dias[data.getDay()];
+    }
+
+    function preencherTabelaFeriados() {
+        const ano = anoAtual();
+        const feriados = [
+            ...feriadosFixos(ano),
+            ...feriadosMoveis(ano)
+        ];
+        // Ordena por data
+        feriados.sort((a, b) => {
+            const [d1, m1, y1] = a.data.split('/').map(Number);
+            const [d2, m2, y2] = b.data.split('/').map(Number);
+            const dateA = new Date(y1, m1 - 1, d1);
+            const dateB = new Date(y2, m2 - 1, d2);
+            return dateA - dateB;
+        });
+
+        const tbody = document.getElementById('tabelaFeriados');
+        tbody.innerHTML = '';
+        feriados.forEach(feriado => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${feriado.data}</td>
+                <td>${diaSemana(feriado.data)}</td>
+                <td>${feriado.nome}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    window.addEventListener('DOMContentLoaded', preencherTabelaFeriados);
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{url_for('static', filename='js/dime_volume_mensal.js')}}"></script>
+
+   
 </body>
 
 </html>

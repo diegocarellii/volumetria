@@ -2,8 +2,11 @@ let chartInstance = null;
 let categories = [];
 let percentages = [];
 let ajustes = {};
+let outlierChartInstance = null;
 
 function updateChart() {
+    document.getElementById('outlierChart').style.display = 'none';
+    document.getElementById('percentChart').style.display = 'block';
     const totalVolumeInput = parseFloat(document.getElementById('totalVolume').value); // Valor total do input
     if (isNaN(totalVolumeInput)) {
         alert('Por favor, insira um valor total válido.');
@@ -127,7 +130,6 @@ function updateChart() {
                 }
             }
         });
-        document.getElementById('percentChart').style.display = 'block';
     }
 }
 
@@ -218,6 +220,8 @@ function processData() {
             a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
         );
 
+        // Primeiro, calcular os valores de %Curva Ajustada para todas as categorias
+        let curvaAjustadaArray = [];
         sortedCategories.forEach(categoria => {
             const volumes = months.slice(0, 3).map(month =>
                 categorizedData[categoria].volumes[month] || 0
@@ -227,24 +231,47 @@ function processData() {
                 const total = index === 0 ? totalVolumeMonth1 : index === 1 ? totalVolumeMonth2 : totalVolumeMonth3;
                 return total > 0 ? Number(((volume / total) * 100).toFixed(2)) : 0;
             });
-
-            // Calcular SOMARPRODUTO
             const totalVolumesSum = totalVolumeMonth1 + totalVolumeMonth2 + totalVolumeMonth3;
             const somarProduto = totalVolumesSum > 0 ? Number(
                 ((percentagesMonth[0] / 100) * volumes[0] +
                     (percentagesMonth[1] / 100) * volumes[1] +
                     (percentagesMonth[2] / 100) * volumes[2]) / (volumes[0] + volumes[1] + volumes[2]) * 100
             ).toFixed(2) : 0;
-            console.log(percentagesMonth[0], percentagesMonth[1], percentagesMonth[2], totalVolumeMonth1, totalVolumeMonth2, totalVolumeMonth3, somarProduto, volumes);
+            curvaAjustadaArray.push({ categoria, valor: Number(somarProduto) });
+        });
+        // Ordenar decrescente e atribuir ranking
+        curvaAjustadaArray.sort((a, b) => b.valor - a.valor);
+        const rankingMap = {};
+        curvaAjustadaArray.forEach((item, idx) => {
+            rankingMap[item.categoria] = idx + 1;
+        });
+
+        // Agora gerar as linhas da tabela incluindo a coluna DMM
+        sortedCategories.forEach(categoria => {
+            const volumes = months.slice(0, 3).map(month =>
+                categorizedData[categoria].volumes[month] || 0
+            );
+            const percentagesMonth = volumes.map((volume, index) => {
+                if (volume === 0) return 0;
+                const total = index === 0 ? totalVolumeMonth1 : index === 1 ? totalVolumeMonth2 : totalVolumeMonth3;
+                return total > 0 ? Number(((volume / total) * 100).toFixed(2)) : 0;
+            });
+            const totalVolumesSum = totalVolumeMonth1 + totalVolumeMonth2 + totalVolumeMonth3;
+            const somarProduto = totalVolumesSum > 0 ? Number(
+                ((percentagesMonth[0] / 100) * volumes[0] +
+                    (percentagesMonth[1] / 100) * volumes[1] +
+                    (percentagesMonth[2] / 100) * volumes[2]) / (volumes[0] + volumes[1] + volumes[2]) * 100
+            ).toFixed(2) : 0;
             categories.push(categoria);
             percentages.push(Number(somarProduto));
-
+            ajustes[categoria] = Number(somarProduto);
             const volume1 = volumes[0] ? volumes[0] : '0';
             const volume2 = volumes[1] ? volumes[1] : '0';
             const volume3 = volumes[2] ? volumes[2] : '0';
-
+            const dmm = rankingMap[categoria];
             const row = `
                 <tr>
+                    <td>${dmm}</td>
                     <td>${categoria}</td>
                     <td>${volume1}</td>
                     <td>${volume2}</td>
@@ -253,12 +280,32 @@ function processData() {
                     <td>${percentagesMonth[1]}%</td>
                     <td>${percentagesMonth[2]}%</td>
                     <td>${somarProduto}%</td>
-                    <td><input type="number" step="0.1" class="form-control ajuste-input" data-categoria="${categoria}" placeholder="Ajuste" onchange="updateAjuste(this, '${categoria}')"></td>
+                    <td>
+                        <input type="number" step="0.1" class="form-control ajuste-input"
+                            data-categoria="${categoria}"
+                            placeholder="Ajuste"
+                            value="${somarProduto}"
+                            onchange="updateAjuste(this, '${categoria}')">
+                    </td>
                 </tr>
             `;
             tableBody.innerHTML += row;
         });
 
+        // Calcular a soma da coluna "% Curva"
+        const somaCurva = percentages.reduce((acc, val) => acc + val, 0).toFixed(2);
+
+        // Adicionar linha de somatório ao final da tabela
+        const totalRow = `
+            <tr style="font-weight: bold; background: #f0f0f0;">
+                <td colspan="8" style="text-align: right;">Somatório % Curva:</td>
+                <td>${somaCurva}%</td>
+                <td id="somaCurvaAjustada"></td>
+            </tr>
+        `;
+        tableBody.innerHTML += totalRow;
+        atualizarSomaCurvaAjustada();
+        classificarCurvaAjustada();
         document.getElementById('resultTable').style.display = 'table';
         updateChart();
     };
@@ -270,6 +317,7 @@ function updateAjuste(input, categoria) {
     const value = input.value ? parseFloat(input.value) : undefined;
     ajustes[categoria] = value;
     updateChart();
+    atualizarSomaCurvaAjustada();
 }
 
 function openNav() {
@@ -281,3 +329,187 @@ function closeNav() {
     document.getElementById("mySidebar").style.width = "0";
     document.getElementsByClassName("main-content")[0].style.marginLeft = "0";
 }
+
+function atualizarSomaCurvaAjustada() {
+    const inputs = document.querySelectorAll('.ajuste-input');
+    let soma = 0;
+    inputs.forEach(input => {
+        const val = parseFloat(input.value);
+        if (!isNaN(val)) soma += val;
+    });
+    const cell = document.getElementById('somaCurvaAjustada');
+    if (cell) cell.textContent = soma.toFixed(2) + '%';
+}
+
+function processOutlier() {
+    const fileInput = document.getElementById('outlierFile').files[0];
+    if (!fileInput) {
+        alert('Por favor, selecione um arquivo Excel para análise de outlier.');
+        return;
+    }
+
+    // Pega os multiplicadores dos inputs
+    const multSup = parseFloat(document.getElementById('limiteSuperiorInput').value) || 1.5;
+    const multInf = parseFloat(document.getElementById('limiteInferiorInput').value) || 1.5;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: false, dateNF: 'yyyy-mm-dd' });
+
+        // Agrupar volumes por mês
+        const meses = {};
+        jsonData.forEach(row => {
+            if (row.Data && row.Volume) {
+                const dataObj = new Date(row.Data);
+                const mesAno = `${dataObj.getFullYear()}-${(dataObj.getMonth() + 1).toString().padStart(2, '0')}`;
+                if (!meses[mesAno]) meses[mesAno] = 0;
+                meses[mesAno] += Number(row.Volume);
+            }
+        });
+
+        // Montar arrays de datas e percentuais
+        const datas = [];
+        const percentuais = [];
+        jsonData.forEach(row => {
+            if (row.Data && row.Volume) {
+                const dataObj = new Date(row.Data);
+                const mesAno = `${dataObj.getFullYear()}-${(dataObj.getMonth() + 1).toString().padStart(2, '0')}`;
+                const totalMes = meses[mesAno];
+                const percentual = totalMes > 0 ? (Number(row.Volume) / totalMes) * 100 : 0;
+                datas.push(row.Data);
+                percentuais.push(percentual);
+            }
+        });
+
+        if (datas.length === 0 || percentuais.length === 0) {
+            alert('Arquivo inválido. Certifique-se de que há colunas "Data" e "Volume".');
+            return;
+        }
+
+        // Calcular limites de controle (média ± multiplicador*desvio padrão dos percentuais)
+        const media = percentuais.reduce((a, b) => a + b, 0) / percentuais.length;
+        const desvio = Math.sqrt(percentuais.reduce((a, b) => a + Math.pow(b - media, 2), 0) / percentuais.length);
+        const limiteSuperior = media + multSup * desvio;
+        const limiteInferior = media - multInf * desvio;
+
+        // Destruir gráfico anterior se existir
+        if (outlierChartInstance) {
+            outlierChartInstance.destroy();
+        }
+
+        document.getElementById('outlierChart').style.display = 'block';
+
+        const ctx = document.getElementById('outlierChart').getContext('2d');
+        outlierChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: datas,
+                datasets: [
+                    {
+                        label: '% do Volume Diário no Mês',
+                        data: percentuais,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.2,
+                        pointRadius: 3,
+                        type: 'line',
+                        order: 0
+                    },
+                    {
+                        label: 'Limite Superior',
+                        data: Array(datas.length).fill(limiteSuperior),
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderDash: [5, 5],
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0,
+                        type: 'line',
+                        order: 1
+                    },
+                    {
+                        label: 'Limite Inferior',
+                        data: Array(datas.length).fill(limiteInferior),
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        borderDash: [5, 5],
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0,
+                        type: 'line',
+                        order: 1
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '% do Volume Diário no Mês'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Data'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Gráfico de Controle de Outlier (% do Volume Diário no Mês)'
+                    }
+                }
+            }
+        });
+    };
+    reader.readAsArrayBuffer(fileInput);
+}
+
+// Atualize o gráfico ao mudar os multiplicadores
+document.getElementById('limiteSuperiorInput').addEventListener('change', processOutlier);
+document.getElementById('limiteInferiorInput').addEventListener('change', processOutlier);
+
+function classificarCurvaAjustada() {
+    // Seleciona todas as linhas do corpo da tabela
+    const linhas = document.querySelectorAll('#resultTable tbody tr');
+    linhas.forEach(linha => {
+        // Pega a célula da %Curva Ajustada (penúltima célula se for input, última se for valor)
+        let celula = linha.querySelector('td:last-child input') ? linha.querySelector('td:last-child input') : linha.querySelector('td:last-child');
+        if (!celula) return;
+        // Se for input, pega o valor do input, senão pega o texto
+        let valor = celula.value !== undefined ? celula.value : celula.textContent;
+        valor = parseFloat(valor.toString().replace('%', '').replace(',', '.'));
+        if (isNaN(valor)) return;
+        // Define a cor de acordo com o valor
+        let cor = '';
+        if (valor >= 5) {
+            cor = '#ff6f6f'; // vermelho
+        } else if (valor >= 4.5) {
+            cor = '#ffb36f'; // laranja
+        } else if (valor >= 2.5) {
+            cor = '#ffe96f'; // amarelo
+        } else if (valor <= 1.5) {
+            cor = '#b6e97c'; // verde claro
+        } else {
+            cor = '#6fdc6f'; // verde forte
+        }
+        // Aplica cor de fundo e negrito
+        if (celula.tagName === 'INPUT') {
+            celula.style.backgroundColor = cor;
+            celula.style.fontWeight = 'bold';
+        } else {
+            celula.style.backgroundColor = cor;
+            celula.style.fontWeight = 'bold';
+        }
+    });
+}
+
+
