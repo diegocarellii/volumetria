@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Processamento de Volume por Categoria</title>
+    <title>Forecasting</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
@@ -12,219 +12,355 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <style>
-    :root {
-        --primary-color: #5D5CDE;
-        --sidebar-bg: #1a1f36;
-        --card-bg: #ffffff;
-    }
+:root {
+            --primary-color: #5D5CDE;
+            --sidebar-bg: #1a1f36;
+            --card-bg: #ffffff;
+            --purple: #9e8dff;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-400: #ced4da;
+            --gray-500: #adb5bd;
+            --gray-600: #6c757d;
+            --gray-700: #495057;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+        }
 
-    /* Sidebar styles */
-    .sidebar {
-        background-color: var(--sidebar-bg);
-        width: 280px;
-        height: 100vh;
-        position: fixed;
-        left: 0;
-        top: 0;
-        transition: 0.3s;
-        z-index: 1000;
-    }
+        /* Sidebar styles */
+        .sidebar {
+            background-color: var(--sidebar-bg);
+            width: 60px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            transition: 0.3s;
+            z-index: 1000;
+            overflow: hidden;
+        }
 
-    .sidebar-collapsed {
-        margin-left: -280px;
-    }
+        .sidebar:hover {
+            width: 200px;
+        }
 
-    .sidebar-header {
-        padding: 1rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
+        .sidebar-collapsed {
+            margin-left: -60px;
+        }
 
-    .sidebar-menu {
-        padding: 1rem 0;
-    }
+        .sidebar-header {
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
 
-    .sidebar-item {
-        padding: 0.75rem 1rem;
-        color: #fff;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        transition: 0.3s;
-    }
+        .sidebar-header img {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto;
+        }
 
-    .sidebar-item:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
+        .sidebar-header h5 {
+            display: none;
+        }
 
-    .sidebar-icon {
-        margin-right: 1rem;
-        width: 20px;
-        text-align: center;
-    }
+        .sidebar:hover .sidebar-header h5 {
+            display: block;
+            margin-top: 0.5rem;
+        }
 
-    /* Dropdown styles */
-    .sidebar-item.dropdown {
-        position: relative;
-        cursor: pointer;
-    }
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
 
-    .sidebar-item.dropdown .dropdown-menu {
-        display: none;
-        position: absolute;
-        left: 100%;
-        top: 0;
-        background-color: var(--sidebar-bg);
-        border-radius: 0 5px 5px 0;
-        padding: 0.5rem 0;
-        min-width: 200px;
-        box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
-        z-index: 1000;
-    }
+        .sidebar-item {
+            padding: 0.75rem;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
 
-    .sidebar-item.dropdown:hover .dropdown-menu {
-        display: block;
-    }
+        .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
 
-    .dropdown-item {
-        display: flex;
-        align-items: center;
-        padding: 0.75rem 1rem;
-        color: #fff;
-        text-decoration: none;
-        transition: 0.3s;
-    }
+        .sidebar-icon {
+            width: 20px;
+            text-align: center;
+            margin-right: 1rem;
+        }
 
-    .dropdown-item:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
+        .sidebar-item span {
+            display: none;
+        }
 
-    .dropdown-item i {
-        margin-right: 0.75rem;
-        width: 20px;
-        text-align: center;
-    }
+        .sidebar:hover .sidebar-item span {
+            display: inline;
+        }
 
-    /* Main content */
-    .main-content {
-        margin-left: 280px;
-        padding: 2rem;
-        transition: 0.3s;
-    }
+        /* Dropdown styles */
+        .sidebar-item.dropdown {
+            position: relative;
+            cursor: pointer;
+        }
 
-    .main-content-expanded {
-        margin-left: 0;
-    }
+        .sidebar-item.dropdown .dropdown-menu {
+            display: none;
+            position: absolute;
+            left: 100%;
+            top: 0;
+            background-color: var(--sidebar-bg);
+            border-radius: 0 5px 5px 0;
+            padding: 0.5rem 0;
+            min-width: 200px;
+            box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
 
-    /* Stats cards */
-    .stats-card {
-        background: white;
-        border-left: 4px solid var(--primary-color);
-        border-radius: 0.5rem;
-        padding: 1rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+        .sidebar-item.dropdown:hover .dropdown-menu {
+            display: block;
+        }
 
-    /* Toggle button */
-    .sidebar-toggle {
-        position: fixed;
-        top: 1rem;
-        left: 1rem;
-        z-index: 1001;
-        display: none;
-    }
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: #fff;
+            text-decoration: none;
+            transition: 0.3s;
+        }
 
-    .table {
-        width: 100%;
-        border-collapse: collapse;
-        background: #fff;
-    }
-    .table th, .table td {
-        border: 1px solid #dee2e6;
-        padding: 8px;
-        text-align: center;
-    }
-    .table thead {
-        background: #343a40;
-        color: #fff;
-    }
-    .table-striped tbody tr:nth-of-type(odd) {
-        background-color: #f2f2f2;
-    }
-    .table-hover tbody tr:hover {
-        background-color: #e9ecef;
-    }
+        .dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown-item i {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main content */
+        .main-content {
+            margin-left: 60px;
+            padding: 2rem;
+            transition: 0.3s;
+        }
+
+        .main-content-expanded {
+            margin-left: 0;
+        }
+
+        /* Toggle button */
+        .sidebar-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: -60px;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .sidebar.show {
+                margin-left: 0;
+            }
+        }
+
+        /* Ajuste no container principal */
+        .container-fluid {
+            margin-left: 60px;
+            /* Adiciona margem igual à largura da barra lateral */
+            padding: 2rem;
+            transition: 0.3s;
+            width: calc(100% - 60px);
+            /* Ajusta a largura considerando a barra lateral */
+        }
+
+        /* Ajuste quando a barra lateral estiver expandida */
+        .sidebar:hover+.container-fluid {
+            margin-left: 200px;
+            width: calc(100% - 200px);
+        }
+
+        /* Ajuste para dispositivos móveis */
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: -60px;
+            }
+
+            .container-fluid {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .sidebar.show {
+                margin-left: 0;
+            }
+
+            .sidebar.show+.container-fluid {
+                margin-left: 60px;
+                width: calc(100% - 60px);
+            }
+        }
+
+        /* Estilo para limitar o tamanho do texto na descrição */
+        .descricao-limitada {
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+        }
+
+        /* Adiciona tooltip ao passar o mouse */
+        .descricao-limitada:hover {
+            cursor: pointer;
+        }
+
+        .resolutiva-coluna:hover {
+            cursor: pointer;
+        }
+
+        /* Estilo para controlar o tamanho da coluna de descrição */
+        .col-descricao {
+            width: 150px !important;
+            max-width: 150px !important;
+        }
+
+        /* Estilos para o dropdown no sidebar */
+        .sidebar-dropdown {
+            position: relative;
+        }
+
+        .sidebar-submenu {
+            display: none;
+            position: fixed;
+            left: 60px;
+            top: 100px;
+            min-width: 200px;
+            background-color: var(--sidebar-bg);
+            padding: 0.5rem 0;
+            border-radius: 0 4px 4px 0;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+        }
+
+        .sidebar-dropdown:hover .sidebar-submenu {
+            display: block;
+        }
+
+        .sidebar-submenu .sidebar-item {
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            color: #fff;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        .sidebar-submenu .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Ajuste para quando o sidebar estiver expandido */
+        .sidebar:hover .sidebar-submenu {
+            left: 200px;
+        }
+
+        /* Ajuste para quando o sidebar estiver retraído */
+        .sidebar:not(:hover) .sidebar-submenu {
+            left: 60px;
+        }
+
+        /* Ajuste para dispositivos móveis */
+        @media (max-width: 768px) {
+            .sidebar-submenu {
+                position: absolute;
+                left: 100%;
+                top: 0;
+            }
+
+            .sidebar.show .sidebar-submenu {
+                left: 200px;
+            }
+        }
 </style>
 
 <body>
-    <!-- Sidebar Toggle Button -->
     <button class="btn btn-primary sidebar-toggle" id="sidebarToggle">
         <i class="fas fa-bars"></i>
     </button>
-
-    <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="d-flex align-items-center">
-                <img src="/static/img/pngwing.com.png" alt="Logo" class="rounded-circle me-2"
-                    style="width: 50px; height: 50px; border: 3px solid #6b50ff;">
-                <h5 class="text-white mb-0">Planejamento</h5>
+            <div class="d-flex align-items-center justify-content-center">
+                <img src="/static/img/pngwing.com.png" alt="Logo" class="rounded-circle"
+                    style="width: 40px; height: 40px; border: 3px solid #6b50ff;">
             </div>
         </div>
 
         <div class="sidebar-menu">
-            <p class="text-secondary small text-center mb-3">MAIN MENU</p>
             <div class="nav flex-column">
-                <a href="home" class="sidebar-item">
-                    <i class="fas fa-home sidebar-icon"></i>
-                    <span>Home</span>
+                <a href="diario" class="sidebar-item" title="Diário de Bordo">
+                    <i class="bi bi-journal-text sidebar-icon"></i>
+                    <span>Diário de Bordo</span>
                 </a>
 
-                <div class="sidebar-item dropdown">
-                    <i class="fas fa-chart-line sidebar-icon"></i>
-                    <span>Forecasting</span>
-                    <div class="dropdown-menu">
-                        <a href="dime_volume_mensal" class="dropdown-item">
-                            <i class="fas fa-calendar-alt"></i>
-                            Volume Mensal
-                        </a>
-                        <a href="volumetria_dist_operadores" class="dropdown-item">
-                            <i class="fas fa-users"></i>
-                            Distribuição Operadores
+                <div class="sidebar-dropdown">
+                    <a href="#" class="sidebar-item" title="Forecasting">
+                        <i class="bi bi-graph-up-arrow sidebar-icon"></i>
+                        <span>Forecasting</span>
+                    </a>
+                    <div class="sidebar-submenu">
+                        <a href="dime_volume_mensal" class="sidebar-item">
+                            <i class="bi bi-calendar-week sidebar-icon"></i>
+                            <span>Forecasting</span>
                         </a>
                     </div>
                 </div>
 
-                <a href="painelVoz" class="sidebar-item">
-                    <i class="fas fa-chart-line sidebar-icon"></i>
-                    <span>Dash</span>
-                </a>
-                <div class="sidebar-item dropdown">
-                    <i class="fas fa-chart-line sidebar-icon"></i>
-                    <span>CHAT</span>
-                    <div class="dropdown-menu">
-                        <a href="clientesUSO" class="sidebar-item">
-                            <i class="fa-solid fa-comment sidebar-icon"></i>
-                            <span>Sent. CHAT</span>
-                        </a>
-                        <a href="analiseTickets" class="sidebar-item">
-                            <i class="fa-solid fa-ticket-alt sidebar-icon"></i>
-                            <span>Análise CHAT</span>
+                <div class="sidebar-dropdown">
+                    <a href="#" class="sidebar-item" title="Liberação CF">
+                        <i class="bi bi-graph-up-arrow sidebar-icon"></i>
+                        <span>Escala / Folgas</span>
+                    </a>
+                    <div class="sidebar-submenu">
+                        <a href="gerador_escala" class="sidebar-item">
+                            <i class="bi bi-calendar-week sidebar-icon"></i>
+                            <span>Gerador Escala</span>
                         </a>
 
-                        <a href="encerramentoUSO" class="sidebar-item">
-                            <i class="fa-solid fa-cog sidebar-icon"></i>
-                            <span>Enc. CHAT</span>
+                        <a href="escala_plan" class="sidebar-item">
+                            <i class="bi bi-calendar-week sidebar-icon"></i>
+                            <span>Visualizar Escala</span>
+                        </a>
+                        <a href="dash_abmas" class="sidebar-item">
+                            <i class="bi bi-calendar-check sidebar-icon"></i>
+                            <span>Folgas CF</span>
                         </a>
                     </div>
                 </div>
-                <a href="mapa" class="sidebar-item">
-                    <i class="fas fa-map-location-dot sidebar-icon"></i>
-                    <span>Mapa</span>
-                </a>
 
-                <a href="/" class="sidebar-item">
-                    <i class="fas fa-circle-exclamation sidebar-icon"></i>
-                    <span>Massivas</span>
+                <a href="gerenciar_chamados" class="sidebar-item" title="Chamados">
+                    <i class="bi bi-ticket-detailed sidebar-icon"></i>
+                    <span>Chamados</span>
                 </a>
             </div>
         </div>
@@ -454,7 +590,7 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{url_for('static', filename='js/dime_volume_mensal.js')}}"></script>
+    <script src="{{url_for('static', filename='/js2/dime_volume_mensal.js')}}"></script>
 
    
 </body>

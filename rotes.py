@@ -243,10 +243,10 @@ def index60():
     return banco1
 
 
-@app.route('/painelVoz')
-def pagina():
+@app.route('/dashboard')
+def dashboard():
     vetor_geral = []
-    return render_template('index.html', vetor_geral=vetor_geral)
+    return render_template('dashboard_plan.html', vetor_geral=vetor_geral)
 
 
 @app.route('/update_geral', methods=['GET'])
