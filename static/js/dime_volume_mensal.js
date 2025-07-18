@@ -264,7 +264,12 @@ function processData() {
             ).toFixed(2) : 0;
             categories.push(categoria);
             percentages.push(Number(somarProduto));
-            ajustes[categoria] = Number(somarProduto);
+            // Se já existe ajuste salvo, mantém, senão usa somarProduto
+            if (ajustes[categoria] === undefined) {
+                ajustes[categoria] = 1.00; // Ajuste padrão é 1 (100%)
+            }
+            const ajustePercentual = ajustes[categoria];
+            const curvaAjustada = (somarProduto * ajustePercentual).toFixed(2);
             const volume1 = volumes[0] ? volumes[0] : '0';
             const volume2 = volumes[1] ? volumes[1] : '0';
             const volume3 = volumes[2] ? volumes[2] : '0';
@@ -281,12 +286,13 @@ function processData() {
                     <td>${percentagesMonth[2]}%</td>
                     <td>${somarProduto}%</td>
                     <td>
-                        <input type="number" step="0.1" class="form-control ajuste-input"
+                        <input type="number" step="0.01" min="0" class="form-control ajuste-input"
                             data-categoria="${categoria}"
                             placeholder="Ajuste"
-                            value="${somarProduto}"
+                            value="${ajustePercentual}"
                             onchange="updateAjuste(this, '${categoria}')">
                     </td>
+                    <td>${curvaAjustada}%</td>
                 </tr>
             `;
             tableBody.innerHTML += row;
@@ -294,19 +300,29 @@ function processData() {
 
         // Calcular a soma da coluna "% Curva"
         const somaCurva = percentages.reduce((acc, val) => acc + val, 0).toFixed(2);
-
+        // Calcular a soma da coluna "%Curva Ajustada"
+        let somaCurvaAjustada = 0;
+        sortedCategories.forEach(categoria => {
+            const idx = categories.indexOf(categoria);
+            const curva = percentages[idx];
+            const ajuste = ajustes[categoria] !== undefined ? ajustes[categoria] : 1.00;
+            somaCurvaAjustada += curva * ajuste;
+        });
+        somaCurvaAjustada = somaCurvaAjustada.toFixed(2);
         // Adicionar linha de somatório ao final da tabela
         const totalRow = `
-            <tr style="font-weight: bold; background: #f0f0f0;">
-                <td colspan="8" style="text-align: right;">Somatório % Curva:</td>
+            <tr id="totalRow" style="font-weight: bold; background: #f0f0f0;">
+                <td colspan="8" style="text-align: right;">Somatório:</td>
                 <td>${somaCurva}%</td>
-                <td id="somaCurvaAjustada"></td>
+                <td></td>
+                <td>${somaCurvaAjustada}%</td>
             </tr>
         `;
         tableBody.innerHTML += totalRow;
         atualizarSomaCurvaAjustada();
         classificarCurvaAjustada();
         document.getElementById('resultTable').style.display = 'table';
+        document.getElementById('downloadTableBtn').style.display = 'inline-block';
         updateChart();
     };
 
@@ -314,10 +330,21 @@ function processData() {
 }
 
 function updateAjuste(input, categoria) {
-    const value = input.value ? parseFloat(input.value) : undefined;
+    const value = input.value ? parseFloat(input.value) : 1.00;
     ajustes[categoria] = value;
-    updateChart();
-    atualizarSomaCurvaAjustada();
+    // Atualiza apenas a célula de %Curva Ajustada na linha correspondente
+    const row = input.closest('tr');
+    if (row) {
+        // % Curva está na 9ª célula (índice 8)
+        const curvaCell = row.cells[8];
+        const curva = curvaCell ? parseFloat(curvaCell.textContent.replace('%', '').replace(',', '.')) : 0;
+        // %Curva Ajustada está na 11ª célula (índice 10)
+        const curvaAjustadaCell = row.cells[10];
+        if (curvaAjustadaCell) {
+            curvaAjustadaCell.textContent = (curva * value).toFixed(2) + '%';
+        }
+    }
+    atualizarSomaCurvaAjustada(); // Garante atualização dinâmica do somatório
 }
 
 function openNav() {
@@ -331,14 +358,31 @@ function closeNav() {
 }
 
 function atualizarSomaCurvaAjustada() {
-    const inputs = document.querySelectorAll('.ajuste-input');
-    let soma = 0;
-    inputs.forEach(input => {
-        const val = parseFloat(input.value);
-        if (!isNaN(val)) soma += val;
+    let somaCurvaAjustada = 0;
+    let somaCurva = 0;
+    const table = document.getElementById('resultTable');
+    if (!table) return;
+    const rows = table.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+        if (row.id === 'totalRow') return;
+        if (row.cells.length < 10) return;
+        const curvaCell = row.cells[8]; // % Curva
+        const ajusteInput = row.cells[9].querySelector('input');
+        const curva = curvaCell ? parseFloat(curvaCell.textContent.replace('%', '').replace(',', '.')) : 0;
+        const ajuste = ajusteInput ? parseFloat(ajusteInput.value) : 1.00;
+        somaCurva += curva;
+        somaCurvaAjustada += curva * ajuste;
     });
-    const cell = document.getElementById('somaCurvaAjustada');
-    if (cell) cell.textContent = soma.toFixed(2) + '%';
+    // Atualiza a linha de somatório
+    const totalRow = document.getElementById('totalRow');
+    if (totalRow) {
+        if (totalRow.cells[8]) totalRow.cells[8].textContent = somaCurva.toFixed(2) + '%';
+        if (totalRow.cells[10]) {
+            totalRow.cells[10].textContent = somaCurvaAjustada.toFixed(2) + '%';
+        } else if (totalRow.cells[totalRow.cells.length - 1]) {
+            totalRow.cells[totalRow.cells.length - 1].textContent = somaCurvaAjustada.toFixed(2) + '%';
+        }
+    }
 }
 
 function processOutlier() {
@@ -510,6 +554,15 @@ function classificarCurvaAjustada() {
             celula.style.fontWeight = 'bold';
         }
     });
+}
+
+// Função para baixar a tabela como Excel
+function downloadTable() {
+    const table = document.getElementById('resultTable');
+    if (!table) return;
+    // Cria uma planilha XLSX a partir da tabela
+    const wb = XLSX.utils.table_to_book(table, {sheet: "Tabela"});
+    XLSX.writeFile(wb, 'tabela_resultado.xlsx');
 }
 
 
